@@ -7,7 +7,7 @@ Requirements:
 1. pip install Scrapy
 2. pip install beautifulsoup4
 3. pip install scrapy_useragents
-4. pip install scrapy-rotated-proxy
+4. pip install scrapy-rotating-proxies
 
 
 How to Run:
