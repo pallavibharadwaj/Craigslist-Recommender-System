@@ -3,6 +3,7 @@ import os, json
 from twisted.internet import reactor, defer
 from scrapy.crawler import CrawlerRunner
 from scrapy.utils.log import configure_logging
+from scrapy.utils.project import get_project_settings
 
 #
 # Spider1 - crawl and fetch 100 elite proxy IPs
@@ -91,7 +92,12 @@ runner = CrawlerRunner()
 
 def crawl():
     yield runner.crawl(ProxySpider)
+
+    # use the modified project settings
+    runner.settings=get_project_settings()
+
     yield runner.crawl(CraigslistSpider)
+
     reactor.stop()
 
 crawl()
