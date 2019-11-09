@@ -64,6 +64,7 @@ class CraigslistSpider(scrapy.Spider):
         for attr in attributes:
             labels[attr] = 1
         fields = {
+            'posting-id':response.css('p.postinginfo::text').re(r'(\d+)'),
             'region': response.css('meta[name="geo.region"]::attr(content)').get(),
             'city': response.css('meta[name="geo.placename"]::attr(content)').get(),
             'position': response.css('meta[name="geo.position"]::attr(content)').get(),
@@ -72,8 +73,8 @@ class CraigslistSpider(scrapy.Spider):
             'image': response.css('meta[property="og:image"]::attr(content)').get(),
             'posted': response.css('time::attr(datetime)').get(),
             'price': response.css('span.price::text').get(),
-            'beds': response.css('b::text').re(r'(\d)+BR'),
-            'baths': response.css('b::text').re(r'(\d)+Ba'),
+            'beds': response.css('b::text').re(r'(\d\.*\d*)+BR'),
+            'baths': response.css('b::text').re(r'(\d\.*\d*)+Ba'),
             'labels': labels
         }
         outfile = "vancouver.json"
