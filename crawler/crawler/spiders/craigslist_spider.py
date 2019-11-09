@@ -1,6 +1,39 @@
 import scrapy
-import random
+import os, json
+from twisted.internet import reactor, defer
+from scrapy.crawler import CrawlerRunner
+from scrapy.utils.log import configure_logging
 
+#
+# Spider1 - crawl and fetch 100 elite proxy IPs
+#
+class ProxySpider(scrapy.Spider):
+    name="proxy"
+
+    def start_requests(self):
+        urls = [
+            'https://www.sslproxies.org/'
+        ]
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)
+
+    def parse(self, response):
+        outfile = "proxies.txt"
+        os.system("rm -f %s" % outfile)
+
+        tr = response.css('table[id="proxylisttable"] tbody tr')
+
+        for row in tr:
+            # proxy - IP:PORT
+            proxy = row.css('td::text').getall()[0]+":"+row.css('td::text').getall()[1]
+
+            with open(outfile, 'a+') as f:
+                f.write(proxy+"\n")
+
+
+#
+# Spider2 - fetch all Craigslist Posts
+#
 class CraigslistSpider(scrapy.Spider):
     name = "craigslist"
 
@@ -12,15 +45,9 @@ class CraigslistSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        page = response.url.split("/")[-2]
-
         # scrape each post in the page
         for post in response.css('li.result-row a::attr(href)').re(r'https://.*'):
             yield response.follow(post, callback=self.parse_post)
-
-            # random delay b/w requests
-            delay = random.randint(2, 10)
-            sleep(delay)
 
         next_page = response.css('a.button.next::attr(href)').re(r'\?s=[\d]+')[0]   # query string
 
@@ -49,5 +76,22 @@ class CraigslistSpider(scrapy.Spider):
             'baths': response.css('b::text').re(r'(\d)+Ba'),
             'labels': labels
         }
-        yield fields
+        outfile = "vancouver.json"
+        with open(outfile, 'a+') as f:
+            json.dump(fields, f)
 
+
+configure_logging()
+#
+# run spiders sequentially
+#
+runner = CrawlerRunner()
+@defer.inlineCallbacks
+
+def crawl():
+    yield runner.crawl(ProxySpider)
+    yield runner.crawl(CraigslistSpider)
+    reactor.stop()
+
+crawl()
+reactor.run()
