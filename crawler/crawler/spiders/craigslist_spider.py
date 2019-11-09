@@ -74,8 +74,8 @@ class CraigslistSpider(scrapy.Spider):
             'image': response.css('meta[property="og:image"]::attr(content)').get(),
             'posted': response.css('time::attr(datetime)').get(),
             'price': response.css('span.price::text').get(),
-            'beds': response.css('b::text').re(r'(\d\.*\d*)+BR'),
-            'baths': response.css('b::text').re(r'(\d\.*\d*)+Ba'),
+            'beds': response.css('b::text').re(r'(\d*\.?\d*)BR'),
+            'baths': response.css('b::text').re(r'(\d*\.?\d*)Ba'),
             'labels': labels
         }
         outfile = "vancouver.json"
