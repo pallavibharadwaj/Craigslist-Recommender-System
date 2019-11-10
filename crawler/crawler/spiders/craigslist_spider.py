@@ -31,7 +31,6 @@ class ProxySpider(scrapy.Spider):
             with open(outfile, 'a+') as f:
                 f.write(proxy+"\n")
 
-
 #
 # Spider2 - fetch all Craigslist Posts
 #
@@ -40,10 +39,15 @@ class CraigslistSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://vancouver.craigslist.org/search/apa'
+            'https://www.craigslist.org/about/sites'
         ]
         for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+            yield scrapy.Request(url=url, callback=self.parse_canada_url)
+
+    def parse_canada_url(self,response):
+        # scrape each region in Canada domain
+        for region in response.css('div.colmask a::attr(href)').re(r'https://\w*\.\w*\.ca'):
+            yield scrapy.Request(url=region+"/search/apa", callback=self.parse) 
 
     def parse(self, response):
         # scrape each post in the page
@@ -54,8 +58,6 @@ class CraigslistSpider(scrapy.Spider):
 
         # loop through all the pages following the next button
         if next_page is not None:
-            global page_count
-            page_count += 1
             next_page = response.urljoin(next_page)
             yield scrapy.Request(next_page, callback=self.parse)
 
@@ -78,7 +80,7 @@ class CraigslistSpider(scrapy.Spider):
             'baths': response.css('b::text').re(r'(\d*\.?\d*)Ba'),
             'labels': labels
         }
-        outfile = "vancouver.json"
+        outfile = "canada.json"
         with open(outfile, 'a+') as f:
             json.dump(fields, f)
 
