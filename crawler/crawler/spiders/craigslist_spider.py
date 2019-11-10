@@ -81,9 +81,9 @@ class CraigslistSpider(scrapy.Spider):
             'labels': labels
         }
         outfile = "canada.json"
-        with open(outfile, 'a+') as f:
+        with open(outfile, 'a') as f:
             json.dump(fields, f)
-
+            f.write("\n")
 
 configure_logging()
 #
