@@ -54,36 +54,39 @@ class CraigslistSpider(scrapy.Spider):
         for post in response.css('li.result-row a::attr(href)').re(r'https://.*'):
             yield response.follow(post, callback=self.parse_post)
 
-        next_page = response.css('a.button.next::attr(href)').re(r'\?s=[\d]+')[0]   # query string
+        if(response.css('a.button.next::attr(href)').re(r'\?s=[\d]+')):
+            next_page = response.css('a.button.next::attr(href)').re(r'\?s=[\d]+')[0]   # query string
 
-        # loop through all the pages following the next button
-        if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback=self.parse)
+            # loop through all the pages following the next button
+            if next_page is not None:
+                next_page = response.urljoin(next_page)
+                yield scrapy.Request(next_page, callback=self.parse)
 
     def parse_post(self, response):
         attributes = response.css('p.attrgroup:nth-child(n+3) span::text').getall()
         labels = {}
         for attr in attributes:
-            labels[attr] = 1
+            if(attr.lstrip()):  # chuck empty labels
+                labels[attr] = 1
         fields = {
-            'posting-id':response.css('p.postinginfo::text').re(r'(\d+)'),
-            'region': response.css('meta[name="geo.region"]::attr(content)').get(),
-            'city': response.css('meta[name="geo.placename"]::attr(content)').get(),
-            'position': response.css('meta[name="geo.position"]::attr(content)').get(),
-            'url': response.css('meta[property="og:url"]::attr(content)').get(),
-            'title': response.css('meta[property="og:title"]::attr(content)').get(),
-            'image': response.css('meta[property="og:image"]::attr(content)').get(),
-            'posted': response.css('time::attr(datetime)').get(),
-            'price': response.css('span.price::text').get(),
-            'beds': response.css('b::text').re(r'(\d*\.?\d*)BR'),
-            'baths': response.css('b::text').re(r'(\d*\.?\d*)Ba'),
+            'postingid': response.css('p.postinginfo::text').re(r'(\d+)')[0] if response.css('p.postinginfo::text').re(r'(\d+)') else None,
+            'region': response.css('meta[name="geo.region"]::attr(content)').get() or None,
+            'city': response.css('meta[name="geo.placename"]::attr(content)').get() or None,
+            'position': response.css('meta[name="geo.position"]::attr(content)').get() or None,
+            'url': response.css('meta[property="og:url"]::attr(content)').get() or None,
+            'title': response.css('meta[property="og:title"]::attr(content)').get() or None,
+            'image': response.css('meta[property="og:image"]::attr(content)').get() or None,
+            'posted': response.css('time::attr(datetime)').get() or None,
+            'price': response.css('span.price::text').get() or None,
+            'beds': float(response.css('b::text').re(r'(\d*\.?\d*)BR')[0]) if response.css('b::text').re(r'(\d*\.?\d*)BR') else None,
+            'baths': float(response.css('b::text').re(r'(\d*\.?\d*)Ba')[0]) if response.css('b::text').re(r'(\d*\.?\d*)Ba') else None,
             'labels': labels
         }
-        outfile = "canada.json"
-        with open(outfile, 'a') as f:
-            json.dump(fields, f)
-            f.write("\n")
+        outfile = "../../../data/canada.json"
+        if(fields['postingid']):
+            with open(outfile, 'a') as f:
+                json.dump(fields, f)
+                f.write("\n")
 
 configure_logging()
 #
