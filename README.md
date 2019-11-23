@@ -36,6 +36,7 @@ Required dependencies and packages:
 pip3 install flask
 pip3 install flask-cors
 ```
+
 How to Run:
 
 ```
