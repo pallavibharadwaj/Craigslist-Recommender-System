@@ -4,16 +4,35 @@
         <title>Craigslist Recommendation System</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Load Highcharts.js -->
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+        <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/mapdata/countries/ca/ca-all.js"></script>
+
+        <script src="https://code.highcharts.com/modules/data.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
     </head>
 
     <body>
         {% extends "layout.html" %}
 
-        {% block content %}          
-        <div class="container">
-            <h1>Analytics coming soon...</h1>
+        {% block content %}
+        <div class="chart_container">
+            <div id="container">
+                <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
+                </script>
+            </div>
+
+            <div id="container2">
+                <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
+                </script>
+            </div>
         </div>
 
         {% endblock %}
+
     </body>
 </html>
