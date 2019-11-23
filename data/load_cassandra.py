@@ -4,13 +4,13 @@ import datetime
 from pyspark.sql import SparkSession,functions,types
 
 
-#cluster_seeds = ['199.60.17.32']
-cluster_seeds = ['127.0.0.1']       #faced an error here - possible fix necessary
-spark = SparkSession.builder.appName('Spark Cassandra example').config('spark.cassandra.connection.host', ','.join(cluster_seeds)).getOrCreate()
+#cluster_seeds = ['199.60.17.32'] #for loading to cluster, in any case
+cluster_seeds = ['127.0.0.1']       
+spark = SparkSession.builder.appName('Data going to Cassandra').config('spark.cassandra.connection.host', ','.join(cluster_seeds)).getOrCreate()
 assert spark.version>='2.4'
 spark.sparkContext.setLogLevel('WARN')
 sc = spark.sparkContext
-spark.conf.set("spark.sql.session.timeZone", "GMT")
+spark.conf.set("spark.sql.session.timeZone", "UTC")
 
 craigslist_schema = types.StructType([
     types.StructField('posted',types.TimestampType()),
@@ -41,17 +41,17 @@ def json_str(input_json):
     input_json['posted']=date_proper
     return input_json
 
-def main(inputs):  
+def main(inputs,keyspace,table):  
     json_listings = inputs.map(json.loads)
-    listings = json_listings.map(json_str)
-   
+    listings = json_listings.map(json_str)   
     listings_df = spark.createDataFrame(listings,schema=craigslist_schema)
-
-    table="craigslistcanada" #table in cluster
-    keyspace="potatobytes"    #keyspace created in cluster
+    #table="craigslistcanada"
+    #keyspace="potatobytes"    
     listings_df.write.format("org.apache.spark.sql.cassandra").options(table=table, keyspace=keyspace).save()
        
 if __name__ == '__main__':
     inputs = sys.argv[1]
     text_input = sc.textFile(inputs)
-    main(text_input)
+    keyspace=sys.argv[2]
+    table=sys.argv[3]
+    main(text_input,keyspace,table)
