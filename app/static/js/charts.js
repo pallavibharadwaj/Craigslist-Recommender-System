@@ -16,8 +16,8 @@ function loadHighcharts(data) {
         },
         colorAxis: {
             min: 0,
-            minColor: '#f1fbfc',
-            maxColor: '#012333',
+            minColor: '#add8e6',
+            maxColor: '#ff0000',
             labels: {
                 formatter: function () {
                     return this.value;
@@ -26,7 +26,7 @@ function loadHighcharts(data) {
         },
         series: [{
             data: data,
-            name: 'Random data',
+            name: 'Number of Posts',
             states: {
                 hover: {
                     color: '#808080'
