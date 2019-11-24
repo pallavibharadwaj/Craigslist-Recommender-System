@@ -21,11 +21,20 @@ python3 craigslist_spider.py
 
 ### Cassandra ###
 
-To populate the scraped listings from the JSON file into the Cassandra database, assuming keyspace and table are already created in Cassandra, run:
+Required dependencies and packages:
+* spark-cassandra-connector:
+```
+git clone https://github.com/datastax/spark-cassandra-connector.git
+cd spark-cassandra-connector
+./sbt/sbt assembly -Dscala-2.11=true
+cp ~/spark-cassandra-connector/spark-cassandra-connector/target/full/scala-2.11/spark-cassandra-connector-assembly-2.4.1-28-g29e31d3.jar $SPARK_HOME/jars/
+```
+
+To populate the scraped listings from the JSON file into the Cassandra database:
 
 ```
 cd ~/craigslist-recommendation-system/data
-spark-submit --packages datastax:spark-cassandra-connector:2.4.0-s_2.11 load_cassandra.py canada.json
+spark-submit load_cassandra.py canada.json <keyspace> <table-name>
 ```
 
 ### Web Application ###
