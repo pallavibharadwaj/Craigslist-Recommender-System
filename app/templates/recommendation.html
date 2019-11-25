@@ -9,11 +9,11 @@
     <body>
         {% extends "layout.html" %}
 
-        {% block content %}          
-        <div class="container">
-            <h1>Recommendations coming soon...</h1>
+        {% block content %}
+        <div id="city"> </div>
+        <div id="listings">
+            <script type="text/javascript" src={{ url_for('static', filename='js/recommender.js') }}/>
         </div>
-
         {% endblock %}
     </body>
 </html>
