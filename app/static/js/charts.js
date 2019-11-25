@@ -121,7 +121,7 @@ function loadHighcharts2() {
 $(document).ready(function () 
 {
     $.ajax({
-        url:"http://localhost:5000/data",
+        url:"http://localhost:5000/chartdata",
         dataType: 'json',
         headers: {  
             'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ $(document).ready(function ()
         }
     });
     $.ajax({
-        url:"http://localhost:5000/data",
+        url:"http://localhost:5000/chartdata",
         dataType: 'json',
         headers: {  
             'Content-Type': 'application/json',
