@@ -2,10 +2,10 @@ import sys,json
 import re,string
 import datetime
 from pyspark.sql import SparkSession,functions,types
-
+from cassandra.cluster import Cluster
 
 #cluster_seeds = ['199.60.17.32'] #for loading to cluster, in any case
-cluster_seeds = ['127.0.0.1']       
+cluster_seeds = ['127.0.0.1']
 spark = SparkSession.builder.appName('Data going to Cassandra').config('spark.cassandra.connection.host', ','.join(cluster_seeds)).getOrCreate()
 assert spark.version>='2.4'
 spark.sparkContext.setLogLevel('WARN')
@@ -22,36 +22,52 @@ craigslist_schema = types.StructType([
     types.StructField('beds',types.FloatType()),
     types.StructField('baths',types.FloatType()),
     types.StructField('city',types.StringType()),
-    types.StructField('position',types.ArrayType(types.FloatType())),
+    types.StructField('latitude',types.FloatType()),
+    types.StructField('longitude',types.FloatType()),
     types.StructField('title', types.StringType()),
-    types.StructField('price',types.StringType()),
+    types.StructField('price',types.FloatType()),
 ])  
 
-def json_str(input_json):
+def transform(input_json):
+    # labels
     label_arr=[]
-    geocodes = []
     for key in input_json['labels']:
         label_arr.append(key)
-    coordinates = input_json['position'].split(';')
-    for coordinate in coordinates:
-        geocodes.append(float(coordinate))
-    date_proper = datetime.datetime.strptime(input_json['posted'],"%Y-%m-%dT%H:%M:%S%z")
     input_json['labels']=label_arr
-    input_json['position']=geocodes
-    input_json['posted']=date_proper
+
+    # geo-coordinates
+    coordinates = input_json['position'].split(';')
+    input_json['latitude']=float(coordinates[0])
+    input_json['longitude']=float(coordinates[1])
+    del input_json['position']
+
+    # price
+    if(input_json['price']):
+        price = input_json['price'][1:]
+        input_json['price']=float(price)
+   
+    # posting date
+    post_time = datetime.datetime.strptime(input_json['posted'],"%Y-%m-%dT%H:%M:%S%z")
+    input_json['posted']=post_time
+
     return input_json
 
-def main(inputs,keyspace,table):  
+def main(inputs):
+    table = "craigslistcanada"
+    keyspace = "potatobytes"
+
+    cluster = Cluster(['127.0.0.1'])
+    session = cluster.connect(keyspace)
+    session.execute("CREATE TABLE IF NOT EXISTS %s (posted TIMESTAMP,region TEXT,postingid TEXT PRIMARY KEY,image TEXT,url TEXT, labels LIST<TEXT>, beds FLOAT, baths FLOAT, city TEXT, latitude FLOAT, longitude FLOAT, title TEXT, price FLOAT);" %table)
+
     json_listings = inputs.map(json.loads)
-    listings = json_listings.map(json_str)   
-    listings_df = spark.createDataFrame(listings,schema=craigslist_schema)
-    #table="craigslistcanada"
-    #keyspace="potatobytes"    
-    listings_df.write.format("org.apache.spark.sql.cassandra").options(table=table, keyspace=keyspace).save()
+    listings = json_listings.map(transform)
+
+    listings = spark.createDataFrame(listings,schema=craigslist_schema)
+
+    listings.write.format("org.apache.spark.sql.cassandra").options(table=table, keyspace=keyspace).save()
        
 if __name__ == '__main__':
     inputs = sys.argv[1]
     text_input = sc.textFile(inputs)
-    keyspace=sys.argv[2]
-    table=sys.argv[3]
-    main(text_input,keyspace,table)
+    main(text_input)
