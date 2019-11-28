@@ -49,6 +49,15 @@
     margin: 0 auto;
 }
 #petanimals {
+<<<<<<< HEAD
+    height: 500px;
+    min-width: 310px;
+    width: 800px;
+    margin: 0 auto;
+}
+#wheelchair {
+=======
+>>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
     height: 500px;
     min-width: 310px;
     width: 800px;

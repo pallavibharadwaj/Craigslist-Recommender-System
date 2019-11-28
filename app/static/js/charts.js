@@ -91,7 +91,10 @@ function loadMedianRent(resp) {
 }
 
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
 function loadPetAnimals(data){
     Highcharts.chart('petanimals', {
     chart: {
@@ -138,6 +141,50 @@ function loadPetAnimals(data){
   });
 }
 
+<<<<<<< HEAD
+function loadWheelchair(data){
+    Highcharts.chart('wheelchair', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Percentage of Canada wide listings that have wheelchair accessibility'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+            }
+        }
+    },
+    series: [{
+        name: 'Listings',
+        colorByPoint: true,
+        data: [{
+            name: 'No wheelchair access',
+            y: data['none'],
+            sliced: true,
+            selected: true
+        }, {
+            name: 'Wheelchair access',
+            y: data['wheelchair']
+        }]
+    }]
+  });
+}
+
+
+=======
+>>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
 $(document).ready(function () 
 {
     $.ajax({
@@ -177,6 +224,23 @@ $(document).ready(function ()
         },
         success:function(json){
             loadPetAnimals(json['petanimals']);
+<<<<<<< HEAD
+        },
+        error:function(request, error){
+            console.log(error); //Should be removed after dev phase
+        }
+    });
+    $.ajax({
+        url:"http://localhost:5000/chartdata",
+        dataType: 'json',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        success:function(json){
+            loadWheelchair(json['wheelchair']);
+=======
+>>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
