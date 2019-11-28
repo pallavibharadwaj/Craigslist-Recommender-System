@@ -42,7 +42,13 @@
     width: 100%;
     margin: 0 auto;
 }
-#container2 {
+#medianrent {
+    height: 500px;
+    min-width: 310px;
+    width: 800px;
+    margin: 0 auto;
+}
+#petanimals {
     height: 500px;
     min-width: 310px;
     width: 800px;

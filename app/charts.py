@@ -1,6 +1,7 @@
 import sys,json
 import re,string
 from pyspark.sql import SparkSession,functions,types
+from pyspark.sql.functions import lower
 
 #cluster_seeds = ['199.60.17.32']
 cluster_seeds = ['127.0.0.1']       #faced an error here - possible fix necessary
@@ -44,21 +45,57 @@ class ChartData:
         resp = data
         return resp
 
-    def data2(self):
-        resp = [
-            ['ca-5682', 0],
-            ['ca-bc', 1],
-            ['ca-nu', 2],
-            ['ca-nt', 3],
-            ['ca-ab', 4],
-            ['ca-nl', 5],
-            ['ca-sk', 6],
-            ['ca-mb', 7],
-            ['ca-qc', 8],
-            ['ca-on', 9],
-            ['ca-nb', 10],
-            ['ca-ns', 11],
-            ['ca-pe', 12],
-            ['ca-yt', 13]
-        ]
+    def median_rent(self):
+        input_df = spark.read.format("org.apache.spark.sql.cassandra") \
+            .options(table='craigslistcanada', keyspace='potatobytes').load()
+        df0 = input_df.filter(input_df.beds.isNotNull())
+        df = df0.withColumn('city',lower(input_df['city']))
+        df.createOrReplaceTempView('df')
+
+        cities = ['toronto','vancouver','calgary','edmonton','waterloo','montreal','ottawa']
+        city_df = df.filter(df['city'].isin(cities))
+        city_df.createOrReplaceTempView('city_df')
+        output = spark.sql("SELECT lower(city) AS city,beds,count(*),approx_percentile(price,0.5) FROM city_df GROUP BY city,beds ORDER BY city").rdd.collect()
+        resp = {}
+        cities = ['calgary','edmonton','montreal','ottawa','toronto','vancouver','waterloo']
+        rent1=[]
+        rent2=[]
+        rent3=[]
+        for row in output:
+            if row[1]==1:
+                rent1.append(row[3])
+            if row[1]==2:
+                rent2.append(row[3])
+            if row[1]==3:
+                rent3.append(row[3])
+        resp['cities']=cities
+        resp['rent1']=rent1
+        resp['rent2']=rent2
+        resp['rent3']=rent3
         return resp
+
+    def pet_animals(self):        
+        inputs = spark.read.format("org.apache.spark.sql.cassandra") \
+            .options(table='craigslistcanada', keyspace='potatobytes').load()
+        l = inputs.select(inputs['labels'])
+        rows = l.rdd.collect()
+        cats=0
+        dogs=0
+        both=0
+        none=0
+        total=0
+        for row in rows:
+            total=total+1
+            if 'cats are OK - purrr' in row[0] and 'dogs are OK - wooof' in row[0]:
+                both=both+1
+            elif 'cats are OK - purrr' in row[0]:
+                cats=cats+1
+            elif 'dogs are OK - wooof' in row[0]:
+                dogs=dogs+1
+            else:
+                none=none+1
+        resp={'cats':cats,'dogs':dogs,'both':both,'none':none}
+        for key in resp:
+            resp[key]=round((resp[key]/total)*100,2)
+        return resp
+

@@ -21,10 +21,12 @@ def analytics():
 def chartdata():
     obj = charts.ChartData()
     value1 = obj.data1()
-    value2 = obj.data2()
+    medianrent = obj.median_rent()
+    petanimals = obj.pet_animals()
     value = {
         'val1': value1,
-        'val2': value2
+        'medianrent':medianrent,
+        'petanimals':petanimals
     }
     return jsonify(value)
 

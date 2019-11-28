@@ -49,73 +49,93 @@ function loadHighcharts(data) {
     });
 }
 
-function loadHighcharts2() {
-    Highcharts.chart('container2', {
+function loadMedianRent(resp) {
+    Highcharts.chart('medianrent', {
         chart: {
-            type: 'spline'
+            type: 'column'
         },
         title: {
-            text: 'Monthly Average Temperature'
-        },
-        subtitle: {
-            text: 'Source: WorldClimate.com'
+            text: 'Median Rent(CAD) in popular Canadian cities'
         },
         xAxis: {
-            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            categories: resp['cities']
         },
         yAxis: {
             title: {
-                text: 'Temperature'
+                text: 'Median Rent'
             },
-            labels: {
-                formatter: function () {
-                    return this.value + '°';
-                }
-            }
         },
         tooltip: {
             crosshairs: true,
             shared: true
         },
         plotOptions: {
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+            series: {
+                allowPointSelect: true
             }
         },
         series: [{
-            name: 'Tokyo',
-            marker: {
-                symbol: 'square'
-            },
-            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, {
-                y: 26.5,
-                marker: {
-                    symbol: 'url(https://www.highcharts.com/samples/graphics/sun.png)'
-                }
-            }, 23.3, 18.3, 13.9, 9.6]
-
-        }, {
-            name: 'London',
-            marker: {
-                symbol: 'diamond'
-            },
-            data: [{
-                y: 3.9,
-                marker: {
-                    symbol: 'url(https://www.highcharts.com/samples/graphics/snow.png)'
-                }
-            }, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+            name:'1 Bedroom',
+            data: resp['rent1']
+        },{
+            name:'2 Bedroom',
+            data:resp['rent2']
+        },{
+            name:'3 Bedroom',
+            data:resp['rent3']
         }],
         credits: {
             enabled: false
         }
-
     });
+}
+
+
+
+function loadPetAnimals(data){
+    Highcharts.chart('petanimals', {
+    chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie'
+    },
+    title: {
+        text: 'Percentage of listings allowing various pets'
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+            }
+        }
+    },
+    series: [{
+        name: 'Listings',
+        colorByPoint: true,
+        data: [{
+            name: 'No pets allowed',
+            y: data['none'],
+            sliced: true,
+            selected: true
+        }, {
+            name: 'Cats',
+            y: data['cats']
+        }, {
+            name: 'Dogs',
+            y: data['dogs']
+        }, {
+            name: 'Both cats and dogs',
+            y: data['both']
+        }]
+    }]
+  });
 }
 
 $(document).ready(function () 
@@ -134,19 +154,32 @@ $(document).ready(function ()
             console.log(error); //Should be removed after dev phase
         }
     });
-    $.ajax({
+   $.ajax({
         url:"http://localhost:5000/chartdata",
         dataType: 'json',
         headers: {  
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*' 
         }, 
-        success:function(){
-            loadHighcharts2();
+        success:function(json){
+            loadMedianRent(json['medianrent']);
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
         }
     });
-
+    $.ajax({
+        url:"http://localhost:5000/chartdata",
+        dataType: 'json',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        success:function(json){
+            loadPetAnimals(json['petanimals']);
+        },
+        error:function(request, error){
+            console.log(error); //Should be removed after dev phase
+        }
+    });
 });
