@@ -90,11 +90,6 @@ function loadMedianRent(resp) {
     });
 }
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
 function loadPetAnimals(data){
     Highcharts.chart('petanimals', {
     chart: {
@@ -141,7 +136,6 @@ function loadPetAnimals(data){
   });
 }
 
-<<<<<<< HEAD
 function loadWheelchair(data){
     Highcharts.chart('wheelchair', {
     chart: {
@@ -182,9 +176,6 @@ function loadWheelchair(data){
   });
 }
 
-
-=======
->>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
 $(document).ready(function () 
 {
     $.ajax({
@@ -224,7 +215,6 @@ $(document).ready(function ()
         },
         success:function(json){
             loadPetAnimals(json['petanimals']);
-<<<<<<< HEAD
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
@@ -239,8 +229,6 @@ $(document).ready(function ()
         },
         success:function(json){
             loadWheelchair(json['wheelchair']);
-=======
->>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
