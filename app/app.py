@@ -23,10 +23,19 @@ def chartdata():
     value1 = obj.data1()
     medianrent = obj.median_rent()
     petanimals = obj.pet_animals()
+<<<<<<< HEAD
+    wheelchair = obj.wheelchair()
+    value = {
+        'val1': value1,
+        'medianrent':medianrent,
+        'petanimals':petanimals,
+        'wheelchair':wheelchair,
+=======
     value = {
         'val1': value1,
         'medianrent':medianrent,
         'petanimals':petanimals
+>>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
     }
     return jsonify(value)
 

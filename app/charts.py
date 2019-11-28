@@ -72,6 +72,7 @@ class ChartData:
         resp['rent1']=rent1
         resp['rent2']=rent2
         resp['rent3']=rent3
+<<<<<<< HEAD
         return resp
 
     def pet_animals(self):        
@@ -95,6 +96,51 @@ class ChartData:
             else:
                 none=none+1
         resp={'cats':cats,'dogs':dogs,'both':both,'none':none}
+        for key in resp:
+            resp[key]=round((resp[key]/total)*100,2)
+        return resp
+
+
+    def wheelchair(self):
+        inputs = spark.read.format("org.apache.spark.sql.cassandra") \
+        .options(table='craigslistcanada', keyspace='potatobytes').load()
+        l = inputs.select(inputs['labels'])
+        rows = l.rdd.collect()
+        wheelchair=0
+        none=0
+        total=0
+        for row in rows:
+       	    total=total+1
+            if 'wheelchair accessible' in row[0]:
+                wheelchair=wheelchair+1
+            else:
+                none=none+1
+        resp={'wheelchair':wheelchair,'none':none}
+=======
+        return resp
+
+    def pet_animals(self):        
+        inputs = spark.read.format("org.apache.spark.sql.cassandra") \
+            .options(table='craigslistcanada', keyspace='potatobytes').load()
+        l = inputs.select(inputs['labels'])
+        rows = l.rdd.collect()
+        cats=0
+        dogs=0
+        both=0
+        none=0
+        total=0
+        for row in rows:
+            total=total+1
+            if 'cats are OK - purrr' in row[0] and 'dogs are OK - wooof' in row[0]:
+                both=both+1
+            elif 'cats are OK - purrr' in row[0]:
+                cats=cats+1
+            elif 'dogs are OK - wooof' in row[0]:
+                dogs=dogs+1
+            else:
+                none=none+1
+        resp={'cats':cats,'dogs':dogs,'both':both,'none':none}
+>>>>>>> 5d03d9013bb71dfbfe6011efa38aa2445d0f09df
         for key in resp:
             resp[key]=round((resp[key]/total)*100,2)
         return resp
