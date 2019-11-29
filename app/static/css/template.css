@@ -56,6 +56,12 @@
     width: 800px;
     margin: 0 auto;
 }
+#heatmap2 {
+    height: 500px;
+    min-width: 310px;
+    width: 100%;
+    margin: 0 auto;
+}
 .loading {
     margin-top: 10em;
     text-align: center;
