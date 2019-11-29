@@ -6,7 +6,7 @@ function loadHighcharts(data) {
             map: 'countries/ca/ca-all',
         },
         title: {
-            text: ''
+            text: 'Heat Map for Number of Posts per Region'
         },
         mapNavigation: {
             enabled: true,
@@ -132,7 +132,10 @@ function loadPetAnimals(data){
             name: 'Both cats and dogs',
             y: data['both']
         }]
-    }]
+    }],
+    credits: {
+            enabled: false
+    }
   });
 }
 
@@ -160,6 +163,9 @@ function loadWheelchair(data){
             }
         }
     },
+    credits: {
+            enabled: false
+    },
     series: [{
         name: 'Listings',
         colorByPoint: true,
@@ -176,6 +182,56 @@ function loadWheelchair(data){
   });
 }
 
+function loadHeatMap(data) {
+    Highcharts.mapChart('heatmap2', {
+        chart: {
+            renderTo: heatmap2,
+            map: 'countries/ca/ca-all',
+        },
+        title: {
+            text: 'Heat Map for Median Price per Region'
+        },
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                verticalAlign: 'bottom'
+            }
+        },
+        colorAxis: {
+            min: 0,
+            minColor: '#add8e6',
+            maxColor: '#ff0000',
+            labels: {
+                formatter: function () {
+                    return this.value;
+                }
+            }
+        },
+        series: [{
+            data: data,
+            name: 'Median Price',
+            states: {
+                hover: {
+                    color: '#808080'
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                format: '{point.name}'
+            },
+        }],
+        xAxis: {
+            maxPadding:0
+        },
+        yAxis: {
+            maxPadding: 0
+        },
+        credits: {
+            enabled: false
+        }
+    });
+}
+
 $(document).ready(function () 
 {
     $.ajax({
@@ -186,7 +242,7 @@ $(document).ready(function ()
             'Access-Control-Allow-Origin': '*' 
         }, 
         success:function(json){
-            loadHighcharts(json['val1']);
+            loadHighcharts(json['heatmap_posts']);
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
@@ -229,6 +285,20 @@ $(document).ready(function ()
         },
         success:function(json){
             loadWheelchair(json['wheelchair']);
+        },
+        error:function(request, error){
+            console.log(error); //Should be removed after dev phase
+        }
+    });
+    $.ajax({
+        url:"http://localhost:5000/chartdata",
+        dataType: 'json',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        success:function(json){
+            loadHeatMap(json['heatmap_price']);
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase

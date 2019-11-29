@@ -27,8 +27,25 @@ data = [
     ['ca-bc', 0]
 ]
 
+data2 = [
+    ['ca-5682', 0],
+    ['ca-nu', 0],
+    ['ca-yt', 0],
+    ['ca-nt', 0],
+    ['ca-ab', 0],
+    ['ca-nl', 0],
+    ['ca-sk', 0],
+    ['ca-mb', 0],
+    ['ca-qc', 0],
+    ['ca-on', 0],
+    ['ca-nb', 0],
+    ['ca-ns', 0],
+    ['ca-pe', 0],
+    ['ca-bc', 0]
+]
+
 class ChartData:
-    def data1(self):
+    def getpostcount(self):
         df = spark.read.format("org.apache.spark.sql.cassandra") \
            .options(table='craigslistcanada', keyspace='potatobytes').load() 
         df.createOrReplaceTempView('df')
@@ -52,12 +69,11 @@ class ChartData:
         df = df0.withColumn('city',lower(input_df['city']))
         df.createOrReplaceTempView('df')
 
-        cities = ['toronto','vancouver','calgary','edmonton','waterloo','montreal','ottawa']
+        cities = ['calgary','edmonton','montreal','ottawa','toronto','vancouver','waterloo']
         city_df = df.filter(df['city'].isin(cities))
         city_df.createOrReplaceTempView('city_df')
         output = spark.sql("SELECT lower(city) AS city,beds,count(*),approx_percentile(price,0.5) FROM city_df GROUP BY city,beds ORDER BY city").rdd.collect()
         resp = {}
-        cities = ['calgary','edmonton','montreal','ottawa','toronto','vancouver','waterloo']
         rent1=[]
         rent2=[]
         rent3=[]
@@ -119,3 +135,19 @@ class ChartData:
             resp[key]=round((resp[key]/total)*100,2)
         return resp
 
+    def getaverageprice(self):
+        df = spark.read.format("org.apache.spark.sql.cassandra") \
+           .options(table='craigslistcanada', keyspace='potatobytes').load()
+        df.createOrReplaceTempView('df')
+
+        output = spark.sql("SELECT LOWER(region) as region, approx_percentile(price,0.5) as median_price FROM df GROUP BY region").rdd.collect()
+
+        for rows in output:
+            if (rows[0]=='ca-yk'):
+                  data2[2][1] = rows[1]
+
+            for i in range(2,14):
+                if(rows[0]==data2[i][0]):
+                    data2[i][1]=rows[1]
+        resp = data2
+        return resp
