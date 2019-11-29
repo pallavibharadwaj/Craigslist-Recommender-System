@@ -1,16 +1,19 @@
-from flask import Flask, render_template, jsonify, url_for
+from flask import Flask, render_template, jsonify, url_for, request
 from flask_cors import CORS
 
-import charts, recommender
+import charts, home
 
 app = Flask(__name__)
 CORS(app)
 
 
 @app.route("/")
-def recommendation():
-    return render_template("recommendation.html")
+def homepage():
+    return render_template("home.html")
 
+@app.route("/favorites")
+def favorites():
+    return render_template("favorites.html")
 
 @app.route("/analytics")
 def analytics():
@@ -28,9 +31,22 @@ def chartdata():
     }
     return jsonify(value)
 
-@app.route("/postdata", methods=['GET'])
-def postdata():
-    obj = recommender.ListingData()
+@app.route("/homedata", methods=['GET'])
+def homedata():
+    obj = home.ListingData()
+    value = obj.getAllListings()
+    return jsonify(value)
+
+@app.route("/add_favorite", methods=['GET'])
+def add_favorite():
+    postingid = request.args.get('postingid')
+    obj = home.ListingData()
+    value = obj.add_favorite(postingid)
+    return jsonify(value)
+
+@app.route("/favoritesdata", methods=['GET'])
+def favoritesdata():
+    obj = home.ListingData()
     value = obj.getAllListings()
     return jsonify(value)
 

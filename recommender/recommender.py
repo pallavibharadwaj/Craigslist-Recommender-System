@@ -14,27 +14,58 @@ spark.sparkContext.setLogLevel('WARN')
 sc = spark.sparkContext
 spark.conf.set('spark.sql.session.timezone','UTC')
 
+def find_similar(predictions, favorites):
+    print("=========predictions============")
+    predictions.show()
+    print("=========favorites============")
+    favorites.show()
+
+    predictions.createOrReplaceTempView('predictions')
+    favorites.createOrReplaceTempView('favorites')
+
+    similar = spark.sql("SELECT p.* FROM predictions as p INNER JOIN favorites as f ON p.prediction==f.prediction").cache()
+    similar = similar.subtract(favorites)  # find posts that are not already favorited
+
+
+    print("=========similar posts============")
+    similar.show()
+    print(similar.count())
+    return similar
+
+def clusterize(data, kval):
+    assembler =  VectorAssembler(inputCols = ['beds','baths','price'], outputCol = 'features', handleInvalid='skip')
+    kmeans = KMeans(k=kval,seed=1)
+    pipeline = Pipeline(stages=[assembler,kmeans])
+    model = pipeline.fit(data)
+
+    # returns all posts with cluster numbers assigned to each under column prediction
+    clusters = model.transform(data)
+
+    return clusters
+
 
 def main(city,keyspace,table):
-    listings = spark.read.format('org.apache.spark.sql.cassandra').options(table=table,keyspace=keyspace).load()    
+    listings = spark.read.format('org.apache.spark.sql.cassandra').options(table=table,keyspace=keyspace).load()
+
     #get all listings with same city name(includes all cases - upper, lower, capitalized)
     city_upper = city.upper() 
     city_caps = city.capitalize()
-    city_list = listings.where((listings['city']==city) | (listings['city']==city_upper) | (listings['city']==city_caps))
-    
-    #find clusters
-    train,validation = city_list.randomSplit([0.75,0.25])
-    rec_assembler =  VectorAssembler(inputCols = ['beds','baths','latitude','longitude','price'], outputCol = 'features', handleInvalid='skip')
-    kmeans = KMeans(k=6,seed=1)
-    rec_pipeline = Pipeline(stages=[rec_assembler,kmeans])
-    rec_model = rec_pipeline.fit(city_list)
-    prediction = rec_model.transform(city_list)  #this dataframe contains clusters under the column prediction
+    data = listings.where((listings['city']==city) | (listings['city']==city_upper) | (listings['city']==city_caps))
+
+    kval = 600
+    prediction = clusterize(data, kval)
+    #prediction.show()
     evaluator = ClusteringEvaluator()
-    
-    #score
-    silhouette = evaluator.evaluate(prediction)
-    print('Silhoutte score(k=6) with Euclidean distance '+str(silhouette))
-   
+    silhouette = evaluator.evaluate(prediction)    #score
+    print('Silhoutte score(k=%s) with Euclidean distance : %s' % (kval, silhouette) )
+
+    #TODO creating dummy favorites
+    favorites = prediction.select(prediction['*']).limit(3)
+
+    # find similar posts
+    similar = find_similar(prediction, favorites)
+
+    """
     #compute centers in clusters
     centers = rec_model.stages[1].clusterCenters()
     print(centers)
@@ -43,29 +74,10 @@ def main(city,keyspace,table):
     data.createOrReplaceTempView('result')
     result = spark.sql('SELECT r.postingid,r.prediction,r.beds,r.baths,r.latitude,r.longitude,r.price,r.url FROM result as r')
     result.sort(result['prediction']).write.csv('vancouver_k6',mode='overwrite')
-
-    """
-    Modify commented part below for recommendations.
-    
-    query1 is the dataframe of favorited data. Right now works only for 1 favorite listing. Need to make changes to include multiple favorites.
-    
-    Suppose user has selected 4 favorites, out of the 4, 3 belong to cluster-0 and 1 belongs to cluster-1, give recommendations from cluster-0.
-    query2 is the dataframe which contains all listings which belong to the same cluster as the favorited option in query 1.
-    """
-
-    """
-    MODIFY:
-    query1 = spark.sql('SELECT postingid,beds,baths,price,latitude,longitude,url,prediction,distance FROM result WHERE postingid=7014841049')
-    query1.createOrReplaceTempView('query1')
-    query1.show()
-
-    query2= spark.sql('SELECT r.postingid,r.beds,r.baths,r.price,r.latitude,r.longitude,r.url,r.prediction FROM result as r,query1 as q WHERE q.prediction=r.prediction')
-    query2.write.csv('query2',mode='overwrite')
-    query2.show()
     """
 
 if __name__ == '__main__':
     city = sys.argv[1]
     keyspace='potatobytes'
-    table='recommender'
+    table='craigslistcanada'
     main(city,keyspace,table)

@@ -129,24 +129,10 @@ $(document).ready(function ()
         }, 
         success:function(json){
             loadHighcharts(json['val1']);
-        },
-        error:function(request, error){
-            console.log(error); //Should be removed after dev phase
-        }
-    });
-    $.ajax({
-        url:"http://localhost:5000/chartdata",
-        dataType: 'json',
-        headers: {  
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*' 
-        }, 
-        success:function(){
             loadHighcharts2();
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
         }
     });
-
 });
