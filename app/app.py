@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, url_for, request
 from flask_cors import CORS
 
-import charts, home
+import charts, home, recommender
 
 app = Flask(__name__)
 CORS(app)
@@ -50,8 +50,8 @@ def add_favorite():
 
 @app.route("/favoritesdata", methods=['GET'])
 def favoritesdata():
-    obj = home.ListingData()
-    value = obj.getAllListings()
+    obj = recommender.ListingData()
+    value = obj.getAllFavorites()
     return jsonify(value)
 
 if __name__ == "__main__":

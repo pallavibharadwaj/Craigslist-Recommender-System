@@ -1,15 +1,17 @@
+// check if an element is in a 2d list
+function exists(arr, search) {
+    return arr.some(row => row.includes(search));
+}
+
 function loadPost(data) {
-    const header = document.getElementById('city')
-    const city = document.createElement('h2')
-    header.append(city)
-    city.innerHTML = data[0][3].toUpperCase()
+    console.log(data)
+    var favorite = 1
 
     var num = 0
     const div = document.getElementById('listings')
     const buildList = (listing) => {
-        console.log(num)
         const newrow = document.createElement('div')
-        const oldrow = $('.row').prev()
+        oldrow = $('.row')
         const col = document.createElement('div')
         const card = document.createElement('div')
         const header = document.createElement('div')
@@ -27,6 +29,7 @@ function loadPost(data) {
             div.append(newrow)
             newrow.append(col)
             newrow.setAttribute('class', 'row')
+            oldrow = newrow
         } else {
             oldrow.append(col)
         }
@@ -59,7 +62,9 @@ function loadPost(data) {
         link.setAttribute('id', 'craig-link')
         a.setAttribute('href', listing[12])
         a.setAttribute('class', 'btn btn-primary')
-        icon.setAttribute('class', 'icon-input-btn glyphicon glyphicon-heart-empty')
+
+        icon.setAttribute('id', 'heart'+num)
+        icon.setAttribute('class', 'icon-input-btn glyphicon glyphicon-heart heart-selected')
         
         h3.innerHTML = listing[11]
         price.innerHTML = listing[9]
@@ -67,8 +72,38 @@ function loadPost(data) {
         if (listing[1]) baths.innerHTML = listing[1] + " Baths"
 
         a.innerHTML = "View on Craigslist"
+        document.getElementById('heart'+num).setAttribute('onclick', 'add_to_favorites(\'' + listing[0] + '\', \'' + num +'\')')
     }
     data.forEach(listing => buildList(listing))
+}
+
+function add_to_favorites(postingid, num, favorite) {
+    $.ajax({
+        url:"http://localhost:5000/add_favorite?postingid="+postingid,
+        dataType: 'json',
+        headers: {  
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*' 
+        },
+        success:function(resp) {
+            if (resp['error'] == undefined){
+                if (document.getElementById('heart'+num).classList.contains('heart-selected')) {
+                    document.getElementById('heart'+num).classList.add('glyphicon-heart-empty')
+                    document.getElementById('heart'+num).classList.remove('heart-selected', 'glyphicon-heart')
+
+                } else  {
+                    document.getElementById('heart'+num).classList.add('class', 'heart-selected', 'glyphicon-heart')
+                    document.getElementById('heart'+num).classList.remove('class', 'glyphicon-heart-empty')
+                }
+            }
+            else {
+                console.log(resp['error'])
+            }
+        },
+        error: function(request, error) {
+            console.log(error)
+        }
+    })
 }
 
 $(document).ready(function () 
@@ -81,10 +116,10 @@ $(document).ready(function ()
             'Access-Control-Allow-Origin': '*' 
         }, 
         success:function(json){
-            loadPost(json);
+            loadPost(json)
         },
         error:function(request, error){
-            console.log(error); //Should be removed after dev phase
+            console.log(error)
         }
     });
 });

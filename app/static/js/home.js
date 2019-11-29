@@ -16,7 +16,7 @@ function loadPost(data) {
     const div = document.getElementById('listings')
     const buildList = (listing) => {
         const newrow = document.createElement('div')
-        const oldrow = $('.row').prev()
+        oldrow = $('.row')
         const col = document.createElement('div')
         const card = document.createElement('div')
         const header = document.createElement('div')
@@ -34,6 +34,7 @@ function loadPost(data) {
             div.append(newrow)
             newrow.append(col)
             newrow.setAttribute('class', 'row')
+            oldrow = newrow
         } else {
             oldrow.append(col)
         }
