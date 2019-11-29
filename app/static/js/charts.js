@@ -163,6 +163,9 @@ function loadWheelchair(data){
             }
         }
     },
+    credits: {
+            enabled: false
+    },
     series: [{
         name: 'Listings',
         colorByPoint: true,
@@ -186,7 +189,7 @@ function loadHeatMap(data) {
             map: 'countries/ca/ca-all',
         },
         title: {
-            text: 'Heat Map for Average Price per Region'
+            text: 'Heat Map for Median Price per Region'
         },
         mapNavigation: {
             enabled: true,
@@ -206,7 +209,7 @@ function loadHeatMap(data) {
         },
         series: [{
             data: data,
-            name: 'Average Price',
+            name: 'Median Price',
             states: {
                 hover: {
                     color: '#808080'
