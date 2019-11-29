@@ -26,7 +26,7 @@ craigslist_schema = types.StructType([
     types.StructField('longitude',types.FloatType()),
     types.StructField('title', types.StringType()),
     types.StructField('price',types.FloatType()),
-])  
+])
 
 def transform(input_json):
     # labels
@@ -53,19 +53,23 @@ def transform(input_json):
     return input_json
 
 def main(inputs):
-    table = "craigslistcanada"
     keyspace = "potatobytes"
 
     cluster = Cluster(['127.0.0.1'])
     session = cluster.connect(keyspace)
+
+    table = "craigslistcanada"
     session.execute("CREATE TABLE IF NOT EXISTS %s (posted TIMESTAMP,region TEXT,postingid TEXT PRIMARY KEY,image TEXT,url TEXT, labels LIST<TEXT>, beds FLOAT, baths FLOAT, city TEXT, latitude FLOAT, longitude FLOAT, title TEXT, price FLOAT);" %table)
 
     json_listings = inputs.map(json.loads)
     listings = json_listings.map(transform)
 
     listings = spark.createDataFrame(listings,schema=craigslist_schema)
+    #listings.write.format("org.apache.spark.sql.cassandra").options(table=table, keyspace=keyspace).save()
 
-    listings.write.format("org.apache.spark.sql.cassandra").options(table=table, keyspace=keyspace).save()
+    # create table to store all posts favorited by user
+    fav_table = "favorites"
+    session.execute("CREATE TABLE IF NOT EXISTS %s (userid TEXT, postingid TEXT, PRIMARY KEY(userid, postingid));" %fav_table)
        
 if __name__ == '__main__':
     inputs = sys.argv[1]

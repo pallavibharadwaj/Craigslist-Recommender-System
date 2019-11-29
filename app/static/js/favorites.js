@@ -2,7 +2,7 @@ function loadPost(data) {
     const header = document.getElementById('city')
     const city = document.createElement('h2')
     header.append(city)
-    city.innerHTML = data[0][8].toUpperCase()
+    city.innerHTML = data[0][3].toUpperCase()
 
     var num = 0
     const div = document.getElementById('listings')
@@ -57,12 +57,12 @@ function loadPost(data) {
 
         link.setAttribute('class', 'card-body')
         link.setAttribute('id', 'craig-link')
-        a.setAttribute('href', listing[3])
+        a.setAttribute('href', listing[12])
         a.setAttribute('class', 'btn btn-primary')
         icon.setAttribute('class', 'icon-input-btn glyphicon glyphicon-heart-empty')
         
-        h3.innerHTML = listing[7]
-        price.innerHTML = listing[5]
+        h3.innerHTML = listing[11]
+        price.innerHTML = listing[9]
         if (listing[2]) beds.innerHTML = listing[2] + " Beds"
         if (listing[1]) baths.innerHTML = listing[1] + " Baths"
 
@@ -74,7 +74,7 @@ function loadPost(data) {
 $(document).ready(function () 
 {
     $.ajax({
-        url:"http://localhost:5000/postdata",
+        url:"http://localhost:5000/favoritesdata",
         dataType: 'json',
         headers: {  
             'Content-Type': 'application/json',
