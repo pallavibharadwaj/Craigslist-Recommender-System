@@ -15,21 +15,18 @@ sc = spark.sparkContext
 spark.conf.set('spark.sql.session.timezone','UTC')
 
 def find_similar(predictions, favorites):
-    print("=========predictions============")
-    predictions.show()
-    print("=========favorites============")
-    favorites.show()
-
     predictions.createOrReplaceTempView('predictions')
     favorites.createOrReplaceTempView('favorites')
 
-    similar = spark.sql("SELECT p.* FROM predictions as p INNER JOIN favorites as f ON p.prediction==f.prediction").cache()
-    similar = similar.subtract(favorites)  # find posts that are not already favorited
+    # cluster numbers of favorites -> all posts in the cluster
+    similar = spark.sql("SELECT p.* from predictions as p \
+                    WHERE prediction IN (SELECT DISTINCT p.prediction FROM predictions as p, favorites as f \
+                            WHERE f.postingid = p.postingid)")
 
-
-    print("=========similar posts============")
-    similar.show()
-    print(similar.count())
+    # all posts in the cluster except the already favorited
+    similar.createOrReplaceTempView('similar')
+    similar = spark.sql("SELECT s.* FROM similar AS s \
+                    WHERE s.postingid NOT IN (SELECT postingid FROM favorites)")
     return similar
 
 def clusterize(data, kval):
@@ -44,23 +41,27 @@ def clusterize(data, kval):
     return clusters
 
 
-def main(city,keyspace,table):
-    listings = spark.read.format('org.apache.spark.sql.cassandra').options(table=table,keyspace=keyspace).load()
+def main():
+    city = 'halifax'
 
-    #get all listings with same city name(includes all cases - upper, lower, capitalized)
+    keyspace='potatobytes'
+    listings_table = 'craigslistcanada'
+    fav_table = 'favorites'
+    listings = spark.read.format('org.apache.spark.sql.cassandra').options(table=listings_table,keyspace=keyspace).load()
+    # read favorited listings
+    favorites = spark.read.format('org.apache.spark.sql.cassandra').options(table=fav_table,keyspace=keyspace).load()
+
+    # get all listings with same city name(includes all cases - upper, lower, capitalized)
     city_upper = city.upper() 
     city_caps = city.capitalize()
     data = listings.where((listings['city']==city) | (listings['city']==city_upper) | (listings['city']==city_caps))
 
-    kval = 600
+    kval = 15   #TODO: find a way to initialize this value
     prediction = clusterize(data, kval)
-    #prediction.show()
     evaluator = ClusteringEvaluator()
+
     silhouette = evaluator.evaluate(prediction)    #score
     print('Silhoutte score(k=%s) with Euclidean distance : %s' % (kval, silhouette) )
-
-    #TODO creating dummy favorites
-    favorites = prediction.select(prediction['*']).limit(3)
 
     # find similar posts
     similar = find_similar(prediction, favorites)
@@ -77,7 +78,4 @@ def main(city,keyspace,table):
     """
 
 if __name__ == '__main__':
-    city = sys.argv[1]
-    keyspace='potatobytes'
-    table='craigslistcanada'
-    main(city,keyspace,table)
+    main()

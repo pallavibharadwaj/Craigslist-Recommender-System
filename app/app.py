@@ -54,7 +54,12 @@ def add_favorite():
 @app.route("/favoritesdata", methods=['GET'])
 def favoritesdata():
     obj = recommender.ListingData()
-    value = obj.getAllFavorites()
+    favorites = obj.getAllFavorites()
+    similar = obj.getAllSimilar()
+    value = {
+        'favorites': favorites,
+        'similar': similar
+    }
     return jsonify(value)
 
 if __name__ == "__main__":
