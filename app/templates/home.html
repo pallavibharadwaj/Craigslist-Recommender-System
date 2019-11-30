@@ -10,9 +10,14 @@
         {% extends "layout.html" %}
 
         {% block content %}
-        <div id="city"> </div>
+        <div id="city">
+            City:<input type="text" id="city_entry" value="vancouver"><button id="gobutton" onclick="loadCityPosts()">GO</button>
+            <script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>
+            </script>
+        </div>
         <div id="listings">
             <script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>
+            </script>
         </div>
         {% endblock %}
     </body>

@@ -7,10 +7,6 @@ function loadPost(data) {
     var favorite = 0
     listings = data['listings']
     fav = data['favorites']
-    const header = document.getElementById('city')
-    const city = document.createElement('h2')
-    header.append(city)
-    city.innerHTML = listings[0][3].toUpperCase()
 
     var num = 0
     const div = document.getElementById('listings')
@@ -101,10 +97,12 @@ function add_to_favorites(postingid, num, favorite) {
                 if (document.getElementById('heart'+num).classList.contains('heart-selected')) {
                     document.getElementById('heart'+num).classList.add('glyphicon-heart-empty')
                     document.getElementById('heart'+num).classList.remove('heart-selected', 'glyphicon-heart')
+                    console.log('Reached undefined')
 
                 } else  {
                     document.getElementById('heart'+num).classList.add('class', 'heart-selected', 'glyphicon-heart')
                     document.getElementById('heart'+num).classList.remove('class', 'glyphicon-heart-empty')
+                    console.log('Reached undefined ELSE')
                 }
             }
             else {
@@ -115,6 +113,30 @@ function add_to_favorites(postingid, num, favorite) {
             console.log(error)
         }
     })
+}
+
+
+function call_home(city) {
+    $.ajax({
+        url:"http://localhost:5000/homedata?city="+city,
+        dataType: 'json',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        success:function(resp) {
+           loadPost(resp)
+        },
+        error: function(request, error) {
+            console.log(error)
+        }
+    });
+}
+
+function loadCityPosts() {
+    city = document.getElementById("city_entry").value
+    console.log(city)
+    call_home(city)
 }
 
 $(document).ready(function () 

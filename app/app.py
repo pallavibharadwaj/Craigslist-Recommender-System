@@ -23,21 +23,23 @@ def analytics():
 @app.route("/chartdata", methods=['GET'])
 def chartdata():
     obj = charts.ChartData()
-    value1 = obj.data1()
+    posts = obj.getpostcount()
     medianrent = obj.median_rent()
     petanimals = obj.pet_animals()
     wheelchair = obj.wheelchair()
+    average_price = obj.getaverageprice()
     value = {
-        'val1': value1,
+        'heatmap_posts': posts,
         'medianrent':medianrent,
         'petanimals':petanimals,
         'wheelchair':wheelchair,
+        'heatmap_price': average_price
     }
     return jsonify(value)
 
 @app.route("/homedata", methods=['GET'])
 def homedata():
-    city = request.args.get('city')
+    city = request.args.get('city') 
     obj = home.ListingData()
     value = obj.getAllListings(city)
     return jsonify(value)

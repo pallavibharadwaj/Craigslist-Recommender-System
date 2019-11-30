@@ -33,8 +33,9 @@ cp ~/spark-cassandra-connector/spark-cassandra-connector/target/full/scala-2.11/
 To populate the scraped listings from the JSON file into the Cassandra database:
 
 ```
+pip3 install cassandra-driver
 cd ~/craigslist-recommendation-system/data
-spark-submit load_cassandra.py canada.json <keyspace> <table-name>
+spark-submit load_cassandra.py canada.json 
 ```
 
 ### Web Application ###
