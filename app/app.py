@@ -39,8 +39,9 @@ def chartdata():
 
 @app.route("/homedata", methods=['GET'])
 def homedata():
+    city = request.args.get('city') 
     obj = home.ListingData()
-    value = obj.getAllListings()
+    value = obj.getAllListings(city)
     return jsonify(value)
 
 @app.route("/add_favorite", methods=['GET'])
