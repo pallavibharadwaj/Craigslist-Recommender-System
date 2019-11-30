@@ -74,35 +74,32 @@
     padding-bottom: 15px;
     padding-right: 100px;
     padding-left: 100px;
-    background-color: #D8D8D8;
 }
 .card {
     border-color: #606666 !important;
     padding-bottom: 30px;
+    padding-left:30px;
     border-bottom: solid;
-    height: 200px;
+    height: 250px;
+    background-color: #D8D8D8;
 }
 .column {
     width: 50%;
     padding-top: 15px;
     position: absolute;
 }
-#bedbath {
-    float: right;
-    padding-right: 40px;
-    position: relative;
-}
 p {
     text-align: right;
 }
-h2 {
-    text-align: center;
+.header {
+    font-family: 'Comic Sans MS';
+    text-align:center;
+    height:100px;
     font-size: 40px;
 }
-
 .icon-input-btn {
     float: right;
-    padding-right: 70px;
+    padding-right: 100px;
     font-size: x-large;
     width: 30px;
     height: 30px;
@@ -110,4 +107,7 @@ h2 {
 
 .heart-selected {
     color: red;
+}
+.card-header {
+    padding-top: 5px;
 }

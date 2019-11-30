@@ -10,8 +10,9 @@
         {% extends "layout.html" %}
 
         {% block content %}
-        <div id="city"> </div>
-        <div id="listings">
+        <div>
+            <div id="favorites"></div>
+            <div id="similar"></div>
             <script type="text/javascript" src={{ url_for('static', filename='js/favorites.js') }}/>
         </div>
         {% endblock %}
