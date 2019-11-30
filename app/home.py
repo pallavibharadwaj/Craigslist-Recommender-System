@@ -28,7 +28,8 @@ select_postid = session.prepare('SELECT * FROM %s'%fav_table)
 
 class ListingData:
     def getAllListings(self,city):
-        print('city: ',city)
+        if(not city):
+            city='vancouver'
         df_all = spark.read.format("org.apache.spark.sql.cassandra") \
             .options(table='craigslistcanada', keyspace='potatobytes').load()
         city_upper = city.upper()
