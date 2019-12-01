@@ -28,23 +28,21 @@ select_postid = session.prepare('SELECT * FROM %s'%fav_table)
 
 class ListingData:
     def getAllListings(self,city):
-        if(not city):
-            city='vancouver'
+        if(city is None):
+            city='surrey'
         df_all = spark.read.format("org.apache.spark.sql.cassandra") \
             .options(table='craigslistcanada', keyspace='potatobytes').load()
         city_upper = city.upper()
         city_caps = city.capitalize()
         data = df_all.where((df_all['city']==city) | (df_all['city']==city_upper) | (df_all['city']==city_caps))
-        d = data.rdd.collect()
-        #data.createOrReplaceTempView('df')
-        #listings = spark.sql("SELECT * FROM df WHERE city='%s'" % city).rdd.collect()
+        listings = data.rdd.collect()
 
         fav = spark.read.format("org.apache.spark.sql.cassandra") \
            .options(table='favorites', keyspace='potatobytes').load()
         fav = fav.rdd.collect()
         
         resp = {
-            'listings': d, #listings
+            'listings': listings, 
             'favorites': fav
         }
         return resp
