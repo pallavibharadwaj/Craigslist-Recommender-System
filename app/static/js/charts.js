@@ -256,6 +256,7 @@ function loadBoxplot(resp) {
     },
 
     yAxis: {
+        floor : 0,
         title: {
             text: 'Price in CAD'
         },
