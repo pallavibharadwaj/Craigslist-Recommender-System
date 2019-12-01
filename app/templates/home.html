@@ -11,9 +11,9 @@
 
         {% block content %}
         <div id="city">
-            City:<input type="text" id="city_entry" value="vancouver"><button id="gobutton" onclick="loadCityPosts()">GO</button>
             <script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>
             </script>
+            City:<input type="text" id="city_entry" value="surrey" ><button id="gobutton" onclick="window.location.reload();">GO</button>
         </div>
         <div id="listings">
             <script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>

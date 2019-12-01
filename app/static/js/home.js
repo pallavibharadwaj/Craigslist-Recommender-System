@@ -149,7 +149,7 @@ $(document).ready(function ()
             'Access-Control-Allow-Origin': '*' 
         }, 
         success:function(json){
-            loadPost(json)
+            loadCityPosts()
         },
         error:function(request, error){
             console.log(error)
