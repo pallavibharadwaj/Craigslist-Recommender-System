@@ -30,19 +30,18 @@ class ListingData:
     def getAllListings(self,city):
         if(city is None):
             city='surrey'
-        df_all = spark.read.format("org.apache.spark.sql.cassandra") \
+        city = city.lower()
+        listings = spark.read.format("org.apache.spark.sql.cassandra") \
             .options(table='craigslistcanada', keyspace='potatobytes').load()
-        city_upper = city.upper()
-        city_caps = city.capitalize()
-        data = df_all.where((df_all['city']==city) | (df_all['city']==city_upper) | (df_all['city']==city_caps))
-        listings = data.rdd.collect()
+
+        listings = listings.where(listings['city']==city).rdd.collect()
 
         fav = spark.read.format("org.apache.spark.sql.cassandra") \
            .options(table='favorites', keyspace='potatobytes').load()
         fav = fav.rdd.collect()
         
         resp = {
-            'listings': listings, 
+            'listings': listings,
             'favorites': fav
         }
         return resp
