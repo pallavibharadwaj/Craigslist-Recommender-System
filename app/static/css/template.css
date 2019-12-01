@@ -154,3 +154,13 @@ p {
 .card-header {
     padding-top: 5px;
 }
+.filter_title {
+    font-family: 'Comic Sans MS';
+    height:70px;
+    font-size: 20px;
+}
+.filter {
+    padding-bottom: 15px;
+    padding-right: 100px;
+    padding-left: 100px;
+}
