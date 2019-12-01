@@ -232,6 +232,51 @@ function loadHeatMap(data) {
     });
 }
 
+function loadBoxplot(resp) {
+    Highcharts.chart('boxplot', {
+
+    chart: {
+        type: 'boxplot'
+    },
+
+    title: {
+        text: 'Box Plot for Rent distribution'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    xAxis: {
+        categories: resp['regions'] ,
+
+        title: {
+            text: 'Province / Territory'
+        }
+    },
+
+    yAxis: {
+        title: {
+            text: 'Price in CAD'
+        },
+    },
+
+    series: [{
+        name: 'Rent Distribution',
+
+        data : resp['val'],
+
+        tooltip: {
+            headerFormat: '<em>Province/Territory : {point.key}</em><br/>'
+        }
+    }],
+        credits: {
+            enabled: false
+        }
+
+  });
+}
+
 $(document).ready(function () 
 {
     $.ajax({
@@ -299,6 +344,20 @@ $(document).ready(function ()
         },
         success:function(json){
             loadHeatMap(json['heatmap_price']);
+        },
+        error:function(request, error){
+            console.log(error); //Should be removed after dev phase
+        }
+    });
+    $.ajax({
+        url:"http://localhost:5000/chartdata",
+        dataType: 'json',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        success:function(json){
+            loadBoxplot(json['boxplot']);
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
