@@ -9,6 +9,9 @@ spark = SparkSession.builder.appName('Spark Cassandra example').config('spark.ca
 assert spark.version>='2.4'
 spark.sparkContext.setLogLevel('WARN')
 spark.conf.set("spark.sql.session.timeZone", "GMT")
+df = spark.read.format("org.apache.spark.sql.cassandra") \
+           .options(table='craigslistcanada', keyspace='potatobytes').load().cache()
+df.createOrReplaceTempView('df')
 
 data = [
     ['ca-5682', 0],
@@ -46,10 +49,6 @@ data2 = [
 
 class ChartData:
     def getpostcount(self):
-        df = spark.read.format("org.apache.spark.sql.cassandra") \
-           .options(table='craigslistcanada', keyspace='potatobytes').load() 
-        df.createOrReplaceTempView('df')
-
         output = spark.sql("SELECT region, count(*) as posts FROM df GROUP BY region ORDER BY posts").rdd.collect()
     
         for rows in output: 
@@ -63,11 +62,7 @@ class ChartData:
         return resp
 
     def median_rent(self):
-        input_df = spark.read.format("org.apache.spark.sql.cassandra") \
-            .options(table='craigslistcanada', keyspace='potatobytes').load()
-        df0 = input_df.filter(input_df.beds.isNotNull())
-        df = df0.withColumn('city',lower(input_df['city']))
-        df.createOrReplaceTempView('df')
+        filtered_df = df.filter(df.beds.isNotNull())
 
         cities = ['calgary','edmonton','montreal','ottawa','toronto','vancouver','waterloo']
         city_df = df.filter(df['city'].isin(cities))
@@ -91,9 +86,7 @@ class ChartData:
         return resp
 
     def pet_animals(self):        
-        inputs = spark.read.format("org.apache.spark.sql.cassandra") \
-            .options(table='craigslistcanada', keyspace='potatobytes').load()
-        l = inputs.select(inputs['labels'])
+        l = df.select(df['labels'])
         rows = l.rdd.collect()
         cats=0
         dogs=0
@@ -117,9 +110,7 @@ class ChartData:
 
 
     def wheelchair(self):
-        inputs = spark.read.format("org.apache.spark.sql.cassandra") \
-        .options(table='craigslistcanada', keyspace='potatobytes').load()
-        l = inputs.select(inputs['labels'])
+        l = df.select(df['labels'])
         rows = l.rdd.collect()
         wheelchair=0
         none=0
@@ -136,10 +127,6 @@ class ChartData:
         return resp
 
     def getaverageprice(self):
-        df = spark.read.format("org.apache.spark.sql.cassandra") \
-           .options(table='craigslistcanada', keyspace='potatobytes').load()
-        df.createOrReplaceTempView('df')
-
         output = spark.sql("SELECT region, approx_percentile(price,0.5) as median_price FROM df GROUP BY region").rdd.collect()
 
         for rows in output:
@@ -153,12 +140,10 @@ class ChartData:
         return resp
 
     def getboxplotvalues(self):
-        df = spark.read.format("org.apache.spark.sql.cassandra") \
-           .options(table='craigslistcanada', keyspace='potatobytes').load()
-        df = df.filter(df.price<=5000).filter( df.price>0)
-        df.createOrReplaceTempView('df')
+        new_df = df.filter(df.price<=5000).filter(df.price>0)
+        new_df.createOrReplaceTempView('new_df')
 
-        output = spark.sql("SELECT region, min(price) as min, approx_percentile(price,0.25) as q1, approx_percentile(price,0.5) as median_price, approx_percentile(price,0.75) as q3, max(price) as max FROM df GROUP BY region ORDER BY region").rdd.collect()
+        output = spark.sql("SELECT region, min(price) as min, approx_percentile(price,0.25) as q1, approx_percentile(price,0.5) as median_price, approx_percentile(price,0.75) as q3, max(price) as max FROM new_df GROUP BY region ORDER BY region").rdd.collect()
         resp = {}
         regions = []
         val = []
