@@ -13,7 +13,10 @@
         <div id="city">
             <script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>
             </script>
-            City:<input type="text" id="city_entry" value="surrey" ><button id="gobutton" onclick="window.location.reload();">GO</button>
+            <div class='filter'>
+                <span class='filter_title'>City:</span>
+                <input type="text" id="city_entry" value="surrey" ><button id="gobutton" class='btn btn-primary' onclick="window.location.reload();">GO</button>
+            </div>
         </div>
         <div id="listings">
             <script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>
