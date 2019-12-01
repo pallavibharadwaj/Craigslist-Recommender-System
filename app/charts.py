@@ -155,7 +155,7 @@ class ChartData:
     def getboxplotvalues(self):
         df = spark.read.format("org.apache.spark.sql.cassandra") \
            .options(table='craigslistcanada', keyspace='potatobytes').load()
-        df = df.filter(df.price<=5000)
+        df = df.filter(df.price<=5000).filter( df.price>0)
         df.createOrReplaceTempView('df')
 
         output = spark.sql("SELECT LOWER(region) as region, min(price) as min, approx_percentile(price,0.25) as q1, approx_percentile(price,0.5) as median_price, approx_percentile(price,0.75) as q3, max(price) as max FROM df GROUP BY region ORDER BY region").rdd.collect()
