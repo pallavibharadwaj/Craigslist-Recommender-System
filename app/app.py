@@ -28,12 +28,14 @@ def chartdata():
     petanimals = obj.pet_animals()
     wheelchair = obj.wheelchair()
     average_price = obj.getaverageprice()
+    boxplot = obj.getboxplotvalues()
     value = {
         'heatmap_posts': posts,
         'medianrent':medianrent,
         'petanimals':petanimals,
         'wheelchair':wheelchair,
-        'heatmap_price': average_price
+        'heatmap_price': average_price,
+        'boxplot' : boxplot
     }
     return jsonify(value)
 

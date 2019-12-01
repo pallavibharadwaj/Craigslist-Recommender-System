@@ -11,7 +11,8 @@
         <script src="https://code.highcharts.com/maps/modules/map.js"></script>
         <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
         <script src="https://code.highcharts.com/mapdata/countries/ca/ca-all.js"></script>
-        
+        <script src="https://code.highcharts.com/highcharts-more.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script> 
         <script src="https://code.highcharts.com/modules/data.js"></script>
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
         <script src="https://code.highcharts.com/modules/export-data.js"></script>
@@ -44,6 +45,12 @@
                 <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
                 </script>
             </div>
+            <figure class="highcharts-figure">
+            <div id="boxplot">
+                <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
+                </script>
+            </div>
+            </figure>
         </div>
     
         {% endblock %}
