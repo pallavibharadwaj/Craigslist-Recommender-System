@@ -50,7 +50,7 @@ class ChartData:
            .options(table='craigslistcanada', keyspace='potatobytes').load() 
         df.createOrReplaceTempView('df')
 
-        output = spark.sql("SELECT LOWER(region) as region, count(*) as posts FROM df GROUP BY region ORDER BY posts").rdd.collect()
+        output = spark.sql("SELECT region, count(*) as posts FROM df GROUP BY region ORDER BY posts").rdd.collect()
     
         for rows in output: 
             if (rows[0]=='ca-yk'):
@@ -72,7 +72,7 @@ class ChartData:
         cities = ['calgary','edmonton','montreal','ottawa','toronto','vancouver','waterloo']
         city_df = df.filter(df['city'].isin(cities))
         city_df.createOrReplaceTempView('city_df')
-        output = spark.sql("SELECT lower(city) AS city,beds,count(*),approx_percentile(price,0.5) FROM city_df GROUP BY city,beds ORDER BY city").rdd.collect()
+        output = spark.sql("SELECT city,beds,count(*),approx_percentile(price,0.5) FROM city_df GROUP BY city,beds ORDER BY city").rdd.collect()
         resp = {}
         rent1=[]
         rent2=[]
@@ -102,11 +102,11 @@ class ChartData:
         total=0
         for row in rows:
             total=total+1
-            if 'cats are OK - purrr' in row[0] and 'dogs are OK - wooof' in row[0]:
+            if 'cats are ok - purrr' in row[0] and 'dogs are ok - wooof' in row[0]:
                 both=both+1
-            elif 'cats are OK - purrr' in row[0]:
+            elif 'cats are ok - purrr' in row[0]:
                 cats=cats+1
-            elif 'dogs are OK - wooof' in row[0]:
+            elif 'dogs are ok - wooof' in row[0]:
                 dogs=dogs+1
             else:
                 none=none+1
@@ -140,7 +140,7 @@ class ChartData:
            .options(table='craigslistcanada', keyspace='potatobytes').load()
         df.createOrReplaceTempView('df')
 
-        output = spark.sql("SELECT LOWER(region) as region, approx_percentile(price,0.5) as median_price FROM df GROUP BY region").rdd.collect()
+        output = spark.sql("SELECT region, approx_percentile(price,0.5) as median_price FROM df GROUP BY region").rdd.collect()
 
         for rows in output:
             if (rows[0]=='ca-yk'):
@@ -158,7 +158,7 @@ class ChartData:
         df = df.filter(df.price<=5000).filter( df.price>0)
         df.createOrReplaceTempView('df')
 
-        output = spark.sql("SELECT LOWER(region) as region, min(price) as min, approx_percentile(price,0.25) as q1, approx_percentile(price,0.5) as median_price, approx_percentile(price,0.75) as q3, max(price) as max FROM df GROUP BY region ORDER BY region").rdd.collect()
+        output = spark.sql("SELECT region, min(price) as min, approx_percentile(price,0.25) as q1, approx_percentile(price,0.5) as median_price, approx_percentile(price,0.75) as q3, max(price) as max FROM df GROUP BY region ORDER BY region").rdd.collect()
         resp = {}
         regions = []
         val = []
