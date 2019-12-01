@@ -29,10 +29,10 @@ craigslist_schema = types.StructType([
 ])
 
 def transform(input_json):
-    # labels
+    # labels - convert to lower and store as list
     label_arr=[]
     for key in input_json['labels']:
-        label_arr.append(key)
+        label_arr.append(key.lower())
     input_json['labels']=label_arr
 
     # geo-coordinates
@@ -45,6 +45,10 @@ def transform(input_json):
     if(input_json['price']):
         price = input_json['price'][1:]
         input_json['price']=float(price)
+
+    # convert all strings to lowercase
+    for key in ['city', 'region']:
+        input_json[key] = input_json[key].lower()
    
     # posting date
     post_time = datetime.datetime.strptime(input_json['posted'],"%Y-%m-%dT%H:%M:%S%z")
@@ -65,7 +69,7 @@ def main(inputs):
     listings = json_listings.map(transform)
 
     listings = spark.createDataFrame(listings,schema=craigslist_schema)
-    #listings.write.format("org.apache.spark.sql.cassandra").options(table=table, keyspace=keyspace).save()
+    listings.write.format("org.apache.spark.sql.cassandra").options(table=table, keyspace=keyspace).save()
 
     # create table to store all posts favorited by user
     fav_table = "favorites"

@@ -97,12 +97,10 @@ function add_to_favorites(postingid, num, favorite) {
                 if (document.getElementById('heart'+num).classList.contains('heart-selected')) {
                     document.getElementById('heart'+num).classList.add('glyphicon-heart-empty')
                     document.getElementById('heart'+num).classList.remove('heart-selected', 'glyphicon-heart')
-                    console.log('Reached undefined')
 
                 } else  {
                     document.getElementById('heart'+num).classList.add('class', 'heart-selected', 'glyphicon-heart')
                     document.getElementById('heart'+num).classList.remove('class', 'glyphicon-heart-empty')
-                    console.log('Reached undefined ELSE')
                 }
             }
             else {
@@ -135,7 +133,6 @@ function call_home(city) {
 
 function loadCityPosts() {
     city = document.getElementById("city_entry").value
-    console.log(city)
     call_home(city)
 }
 

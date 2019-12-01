@@ -62,19 +62,19 @@ class ListingData:
         return clusters
 
     def getAllSimilar(self):
-        city = 'halifax'
-
         keyspace='potatobytes'
         listings_table = 'craigslistcanada'
         fav_table = 'favorites'
-        listings = spark.read.format('org.apache.spark.sql.cassandra').options(table=listings_table,keyspace=keyspace).load()
+        listings = spark.read.format('org.apache.spark.sql.cassandra').options(table=listings_table,keyspace=keyspace).load().cache()
         # read favorited listings
-        favorites = spark.read.format('org.apache.spark.sql.cassandra').options(table=fav_table,keyspace=keyspace).load()
+        favorites = spark.read.format('org.apache.spark.sql.cassandra').options(table=fav_table,keyspace=keyspace).load().cache()
 
-        # get all listings with same city name(includes all cases - upper, lower, capitalized)
-        city_upper = city.upper() 
-        city_caps = city.capitalize()
-        data = listings.where((listings['city']==city) | (listings['city']==city_upper) | (listings['city']==city_caps))
+        # one value at any given time
+        city = spark.sql("SELECT city from listings as l \
+            WHERE l.postingid=(SELECT postingid FROM favorites WHERE userid='potato' LIMIT 1)").collect()[0]['city']
+
+        # get all listings with in the city
+        data = listings.where(listings['city']==city)
 
         kval = 15   #TODO: find a way to initialize this value
         prediction = self.clusterize(data, kval)

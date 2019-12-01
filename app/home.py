@@ -54,13 +54,10 @@ class ListingData:
             fav_rows = session.execute(select_postid)
             if(fav_rows):
                 fav_postingid=fav_rows[0][1]            
-                print('fav_postingid inside first if: ',fav_postingid, type(fav_postingid))
                 fav_city_rows = session.execute(select_fav_city,[fav_postingid])
                 fav_city = fav_city_rows[0][0]
-                print('city within fav table: ',fav_city)
                 city_rows = session.execute(select_fav_city, [postingid])
                 city = city_rows[0][0]
-                print('city from current listing: ',city)
                 if fav_city==city:
                     if(session.execute(select_favorite, row)):  # delete if already in favorites
                         session.execute(delete_favorite, row)
