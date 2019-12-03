@@ -8,11 +8,13 @@ cluster_seeds = ['127.0.0.1']       #faced an error here - possible fix necessar
 spark = SparkSession.builder.appName('Spark Cassandra example').config('spark.cassandra.connection.host', ','.join(cluster_seeds)).getOrCreate()
 assert spark.version>='2.4'
 spark.sparkContext.setLogLevel('WARN')
-spark.conf.set("spark.sql.session.timeZone", "GMT")
+spark.conf.set("spark.sql.session.timeZone", "UTC")
 df = spark.read.format("org.apache.spark.sql.cassandra") \
            .options(table='craigslistcanada', keyspace='potatobytes').load().cache()
+total_count = df.count()  #number of total records
 df.createOrReplaceTempView('df')
 
+ 
 data = [
     ['ca-5682', 0],
     ['ca-nu', 0],
@@ -85,45 +87,26 @@ class ChartData:
         resp['rent3']=rent3
         return resp
 
-    def pet_animals(self):        
-        l = df.select(df['labels'])
-        rows = l.rdd.collect()
-        cats=0
-        dogs=0
-        both=0
-        none=0
-        total=0
-        for row in rows:
-            total=total+1
-            if 'cats are ok - purrr' in row[0] and 'dogs are ok - wooof' in row[0]:
-                both=both+1
-            elif 'cats are ok - purrr' in row[0]:
-                cats=cats+1
-            elif 'dogs are ok - wooof' in row[0]:
-                dogs=dogs+1
-            else:
-                none=none+1
-        resp={'cats':cats,'dogs':dogs,'both':both,'none':none}
+    def pet_animals(self):     
+        cats = df.filter(functions.array_contains(df['labels'],'cats are ok - purrr'))
+        both  = cats.filter(functions.array_contains(cats['labels'],'dogs are ok - wooof'))
+        both_count = both.count()
+
+        dogs = df.filter(functions.array_contains(df['labels'],'dogs are ok - wooof'))
+        dog_count = dogs.count() - both_count
+        cat_count = cats.count() - both_count
+        none = total_count - (cat_count+dog_count+both_count)
+        resp={'cats':cat_count,'dogs':dog_count,'both':both_count,'none':none}
         for key in resp:
-            resp[key]=round((resp[key]/total)*100,2)
+            resp[key]=round((resp[key]/total_count)*100,2)
         return resp
 
-
     def wheelchair(self):
-        l = df.select(df['labels'])
-        rows = l.rdd.collect()
-        wheelchair=0
-        none=0
-        total=0
-        for row in rows:
-       	    total=total+1
-            if 'wheelchair accessible' in row[0]:
-                wheelchair=wheelchair+1
-            else:
-                none=none+1
-        resp={'wheelchair':wheelchair,'none':none}
+        wheelchair = df.filter(functions.array_contains(df['labels'],'wheelchair accessible'))
+        wheelchair_count = wheelchair.count()
+        resp={'wheelchair':wheelchair_count,'none':total_count-wheelchair_count}
         for key in resp:
-            resp[key]=round((resp[key]/total)*100,2)
+            resp[key]=round((resp[key]/total_count)*100,2)
         return resp
 
     def getaverageprice(self):
