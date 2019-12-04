@@ -28,12 +28,13 @@
                 <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
                 </script>
             </div>
-
-            <div id="medianrent">
+            <figure class="highcharts-figure">
+            <div id="boxplot">
                 <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
                 </script>
             </div>
-            <div id="heatmap2">
+            </figure>
+            <div id="medianrent">
                 <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
                 </script>
             </div>
@@ -41,16 +42,14 @@
                 <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
                 </script>
             </div>
+            <div id="heatmap2">
+                <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
+                </script>
+            </div>
             <div id="wheelchair">
                 <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
                 </script>
             </div>
-            <figure class="highcharts-figure">
-            <div id="boxplot">
-                <script type="text/javascript" src={{ url_for('static', filename='js/charts.js') }}>
-                </script>
-            </div>
-            </figure>
         </div>
     
         {% endblock %}
