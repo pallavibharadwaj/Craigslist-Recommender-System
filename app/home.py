@@ -27,15 +27,16 @@ select_postid = session.prepare('SELECT * FROM %s'%fav_table)
 
 
 class ListingData:
-    def getAllListings(self,city):
+    def getAllListings(self,city,beds):
         if(city is None):
             city='surrey'
         city = city.lower()
         listings = spark.read.format("org.apache.spark.sql.cassandra") \
-            .options(table='craigslistcanada', keyspace='potatobytes').load()
-
-        listings = listings.where(listings['city']==city).rdd.collect()
-
+            .options(table='craigslistcanada', keyspace='potatobytes').load().cache()
+        if(beds is None):
+            listings = listings.where(listings['city']==city).rdd.collect()
+        else:
+            listings = listings.where(listings['city']==city).where(listings['beds']==float(beds)).rdd.collect()
         fav = spark.read.format("org.apache.spark.sql.cassandra") \
            .options(table='favorites', keyspace='potatobytes').load()
         fav = fav.rdd.collect()

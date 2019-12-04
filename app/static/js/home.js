@@ -114,26 +114,45 @@ function add_to_favorites(postingid, num, favorite) {
 }
 
 
-function call_home(city) {
-    $.ajax({
-        url:"http://localhost:5000/homedata?city="+city,
-        dataType: 'json',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        success:function(resp) {
-           loadPost(resp)
-        },
-        error: function(request, error) {
-            console.log(error)
-        }
-    });
+function call_home(city,beds) {
+    if(beds){
+        $.ajax({
+            url:"http://localhost:5000/homedata?city="+city+"&beds="+beds,
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            success:function(resp) {
+            loadPost(resp)
+            },
+            error: function(request, error) {
+                console.log(error)
+            }
+        });
+    }
+    else{
+        $.ajax({
+            url:"http://localhost:5000/homedata?city="+city,
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            success:function(resp) {
+            loadPost(resp)
+            },
+            error: function(request, error) {
+                console.log(error)
+            }
+        }); 
+    }
 }
 
 function loadCityPosts() {
     city = document.getElementById("city_entry").value
-    call_home(city)
+    beds = document.getElementById("beds_entry").value
+    call_home(city,beds)
 }
 
 $(document).ready(function () 
