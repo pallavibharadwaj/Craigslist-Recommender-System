@@ -4,9 +4,15 @@ function exists(arr, search) {
 }
 
 function loadPost(data) {
+    document.getElementById("listings").innerHTML = "";
     var favorite = 0
     listings = data['listings']
     fav = data['favorites']
+    
+    document.getElementById('prev').setAttribute('onclick', 'load_home(\'prev_' + listings[listings.length-1][0] + '\')')
+    document.getElementById('next').setAttribute('onclick', 'load_home(\'next_' + listings[listings.length-1][0] + '\')')
+
+    document.getElementById("gobutton").setAttribute('onclick', 'load_home(\'first\')')
 
     var num = 0
     const div = document.getElementById('listings')
@@ -113,62 +119,28 @@ function add_to_favorites(postingid, num, favorite) {
     })
 }
 
-
-function call_home(city,beds) {
-    if(beds){
-        $.ajax({
-            url:"http://localhost:5000/homedata?city="+city+"&beds="+beds,
-            dataType: 'json',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            success:function(resp) {
-            loadPost(resp)
-            },
-            error: function(request, error) {
-                console.log(error)
-            }
-        });
-    }
-    else{
-        $.ajax({
-            url:"http://localhost:5000/homedata?city="+city,
-            dataType: 'json',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            success:function(resp) {
-            loadPost(resp)
-            },
-            error: function(request, error) {
-                console.log(error)
-            }
-        }); 
-    }
-}
-
-function loadCityPosts() {
+function load_home(postingid) 
+{
     city = document.getElementById("city_entry").value
     beds = document.getElementById("beds_entry").value
-    call_home(city,beds)
-}
-
-$(document).ready(function () 
-{
+    url = (beds) ? "http://localhost:5000/homedata?city="+city+"&beds="+beds+"&postingid="+postingid : 
+        "http://localhost:5000/homedata?city="+city+"&postingid="+postingid
     $.ajax({
-        url:"http://localhost:5000/homedata",
+        url: url,
         dataType: 'json',
         headers: {  
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*' 
         }, 
         success:function(json){
-            loadCityPosts()
+            loadPost(json)
         },
         error:function(request, error){
             console.log(error)
         }
     });
-});
+}
+
+$(document).ready(
+    load_home('first')
+);

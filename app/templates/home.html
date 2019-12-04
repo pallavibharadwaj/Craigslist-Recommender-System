@@ -11,14 +11,20 @@
 
         {% block content %}
         <div id="city">
-            <script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>
-            </script>
+            <!--<script type="text/javascript" src={{ url_for('static', filename='js/home.js') }}/>
+            </script>-->
             <div class='filter'>
                 <span class='filter_title'>City:</span>
                 <input type="text" id="city_entry" value="surrey" >
                 <span class='filter_title'>Beds:</span>
                 <input type="text" id="beds_entry">
-                <button id="gobutton" class='btn btn-primary' onclick="window.location.reload();">GO</button>
+                <button id="gobutton" class='btn btn-primary'>GO</button>
+
+                <div class="paginate" getnext = "first">
+                    <a id="prev" href="#">prev</a>
+                    <span> &nbsp&nbsp </span>
+                    <a id="next" href="#">next</a>
+                </div>
             </div>
         </div>
         <div id="listings">

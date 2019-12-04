@@ -164,3 +164,11 @@ p {
     padding-right: 100px;
     padding-left: 100px;
 }
+.glyphicon-home {
+    color: white;
+    padding-right: 0px;
+}
+.paginate {
+    float: right;
+    font-size: 20px;
+}
