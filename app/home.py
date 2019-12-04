@@ -4,6 +4,7 @@ from pyspark.sql import SparkSession, types
 from pyspark.sql.functions import to_json, col, struct
 from cassandra.cluster import Cluster
 
+
 #cluster_seeds = ['199.60.17.32']
 cluster_seeds = ['127.0.0.1']
 spark = SparkSession.builder.appName('Spark Cassandra example').config('spark.cassandra.connection.host', ','.join(cluster_seeds)).getOrCreate()
@@ -17,6 +18,13 @@ session = cluster.connect(keyspace)
 
 fav_table = "favorites"
 craigslist_table = "craigslistcanada"
+
+# load only 20 posts at a time
+next_postings = session.prepare('SELECT * FROM %s WHERE token(postingid) > token(?) AND city=? LIMIT 20 ALLOW FILTERING' % craigslist_table)
+prev_postings = session.prepare('SELECT * FROM %s WHERE token(postingid) < token(?) AND city=? LIMIT 20 ALLOW FILTERING' % craigslist_table)
+next_postings_beds = session.prepare('SELECT * FROM %s WHERE token(postingid) > token(?) AND city=? AND beds=? LIMIT 20 ALLOW FILTERING' % craigslist_table)
+prev_postings_beds = session.prepare('SELECT * FROM %s WHERE token(postingid) < token(?) AND city=? AND beds=? LIMIT 20 ALLOW FILTERING' % craigslist_table)
+
 insert_favorite = session.prepare('INSERT INTO %s (userid, postingid) VALUES (?,?)' % fav_table)
 delete_favorite = session.prepare('DELETE FROM %s WHERE userid=? AND postingid=? IF EXISTS' % fav_table)
 select_favorite = session.prepare('SELECT * from %s WHERE userid=? AND postingid=? ALLOW FILTERING' %fav_table)
@@ -27,22 +35,36 @@ select_postid = session.prepare('SELECT * FROM %s'%fav_table)
 
 
 class ListingData:
-    def getAllListings(self,city,beds):
+    def getAllListings(self, city, beds, last_post):
         if(city is None):
             city='surrey'
         city = city.lower()
-        listings = spark.read.format("org.apache.spark.sql.cassandra") \
-            .options(table='craigslistcanada', keyspace='potatobytes').load().cache()
-        if(beds is None):
-            listings = listings.where(listings['city']==city).rdd.collect()
-        else:
-            listings = listings.where(listings['city']==city).where(listings['beds']==float(beds)).rdd.collect()
+
+        if(last_post == 'first'):   # On first page load
+            if (beds is None):
+                listings = session.execute(next_postings, ['', city])
+            else:
+                listings = session.execute(next_postings_beds, ['', city, float(beds)])   
+        else:   # Next or Prev button is clicked 
+            args = last_post.split('_')
+            if(beds is None):
+                if(args[0]=='next'):
+                    listings = session.execute(next_postings, [args[1], city])
+                else:
+                    listings = session.execute(prev_postings, [args[1], city])
+            else:
+                if(args[0]=='next'):
+                    listings = session.execute(next_postings_beds, [args[1], city, float(beds)])
+                else:
+                    listings = session.execute(prev_postings_beds, [args[1], city, float(beds)])
+
+        # get all favorites to show favorited items on reload
         fav = spark.read.format("org.apache.spark.sql.cassandra") \
            .options(table='favorites', keyspace='potatobytes').load()
         fav = fav.rdd.collect()
         
         resp = {
-            'listings': listings,
+            'listings': list(listings),
             'favorites': fav
         }
         return resp
