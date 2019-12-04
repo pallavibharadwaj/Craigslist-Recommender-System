@@ -15,53 +15,14 @@ total_count = df.count()  #number of total records
 df.createOrReplaceTempView('df')
 
  
-data = [
-    ['ca-5682', 0],
-    ['ca-nu', 0],
-    ['ca-yt', 0],
-    ['ca-nt', 0],
-    ['ca-ab', 0],
-    ['ca-nl', 0],
-    ['ca-sk', 0],
-    ['ca-mb', 0],
-    ['ca-qc', 0],
-    ['ca-on', 0],
-    ['ca-nb', 0],
-    ['ca-ns', 0],
-    ['ca-pe', 0],
-    ['ca-bc', 0]
-]
-
-data2 = [
-    ['ca-5682', 0],
-    ['ca-nu', 0],
-    ['ca-yt', 0],
-    ['ca-nt', 0],
-    ['ca-ab', 0],
-    ['ca-nl', 0],
-    ['ca-sk', 0],
-    ['ca-mb', 0],
-    ['ca-qc', 0],
-    ['ca-on', 0],
-    ['ca-nb', 0],
-    ['ca-ns', 0],
-    ['ca-pe', 0],
-    ['ca-bc', 0]
-]
-
 class ChartData:
     def getpostcount(self):
-        output = spark.sql("SELECT region, count(*) as posts FROM df GROUP BY region ORDER BY posts").rdd.collect()
-    
-        for rows in output: 
-            if (rows[0]=='ca-yk'):
-                  data[2][1] = rows[1]
-           
-            for i in range(2,14):
-                if(rows[0]==data[i][0]):
-                    data[i][1]=rows[1]
-        resp = data
-        return resp
+        output = spark.sql("SELECT region, count(*) as posts FROM df GROUP BY region ORDER BY posts")
+        default_df = spark.createDataFrame([['ca-5682', 0],['ca-nu', 0],['ca-yt', 0],['ca-nt', 0],['ca-ab', 0],['ca-nl', 0],['ca-sk', 0],['ca-mb', 0],['ca-qc', 0],['ca-on', 0],['ca-nb', 0],['ca-ns', 0],['ca-pe', 0],['ca-bc', 0]],['Region','Posts'])
+        new_df = default_df.union(output)
+        new_df = new_df.withColumn('region',functions.regexp_replace('region','ca-yk','ca-yt'))
+        data = new_df.groupBy('region').sum().collect()
+        return data    
 
     def median_rent(self):
         filtered_df = df.filter(df.beds.isNotNull())
@@ -110,17 +71,12 @@ class ChartData:
         return resp
 
     def getaverageprice(self):
-        output = spark.sql("SELECT region, approx_percentile(price,0.5) as median_price FROM df GROUP BY region").rdd.collect()
-
-        for rows in output:
-            if (rows[0]=='ca-yk'):
-                  data2[2][1] = rows[1]
-
-            for i in range(2,14):
-                if(rows[0]==data2[i][0]):
-                    data2[i][1]=rows[1]
-        resp = data2
-        return resp
+        output = spark.sql("SELECT region, approx_percentile(price,0.5) as median_price FROM df GROUP BY region")
+        default_df = spark.createDataFrame([['ca-5682', 0],['ca-nu', 0],['ca-yt', 0],['ca-nt', 0],['ca-ab', 0],['ca-nl', 0],['ca-sk', 0],['ca-mb', 0],['ca-qc', 0],['ca-on', 0],['ca-nb', 0],['ca-ns', 0],['ca-pe', 0],['ca-bc', 0]],['Region','Posts'])
+        new_df = default_df.union(output)
+        new_df = new_df.withColumn('region',functions.regexp_replace('region','ca-yk','ca-yt'))
+        data = new_df.groupBy('region').sum().collect()
+        return data
 
     def getboxplotvalues(self):
         new_df = df.filter(df.price<=5000).filter(df.price>0)
