@@ -6,7 +6,7 @@ function loadHighcharts(data) {
             map: 'countries/ca/ca-all',
         },
         title: {
-            text: 'Heat Map for Number of Posts per Region'
+            text: 'Number of Posts per Region'
         },
         mapNavigation: {
             enabled: true,
@@ -189,7 +189,7 @@ function loadHeatMap(data) {
             map: 'countries/ca/ca-all',
         },
         title: {
-            text: 'Heat Map for Median Price per Region'
+            text: 'Average Price per Region'
         },
         mapNavigation: {
             enabled: true,
@@ -209,7 +209,7 @@ function loadHeatMap(data) {
         },
         series: [{
             data: data,
-            name: 'Median Price',
+            name: 'Average Price',
             states: {
                 hover: {
                     color: '#808080'
@@ -240,7 +240,7 @@ function loadBoxplot(resp) {
     },
 
     title: {
-        text: 'Box Plot for Rent distribution'
+        text: 'Rent distribution for each region'
     },
 
     legend: {

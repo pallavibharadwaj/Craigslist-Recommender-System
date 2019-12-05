@@ -71,7 +71,9 @@ class ChartData:
         return resp
 
     def getaverageprice(self):
-        output = spark.sql("SELECT region, approx_percentile(price,0.5) as median_price FROM df GROUP BY region")
+        new_df = df.filter(df.price<=5000).filter(df.price>0)
+        new_df.createOrReplaceTempView('new_df')
+        output = spark.sql("SELECT region, round(avg(price),2) as average FROM new_df GROUP BY region")
         default_df = spark.createDataFrame([['ca-5682', 0],['ca-nu', 0],['ca-yt', 0],['ca-nt', 0],['ca-ab', 0],['ca-nl', 0],['ca-sk', 0],['ca-mb', 0],['ca-qc', 0],['ca-on', 0],['ca-nb', 0],['ca-ns', 0],['ca-pe', 0],['ca-bc', 0]],['Region','Posts'])
         new_df = default_df.union(output)
         new_df = new_df.withColumn('region',functions.regexp_replace('region','ca-yk','ca-yt'))
