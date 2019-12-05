@@ -92,3 +92,12 @@ class ChartData:
         resp['regions'] = regions
         resp['val'] = val
         return resp
+
+    def getsplinevalues(self):
+        values = spark.sql("SELECT Region, DAYOFWEEK(posted) as DAY, count(*) as count from df GROUP BY day,region ORDER BY region,DAY").rdd.collect()
+        default = [['ca-yk', [0,0,0,0,0,0,0]],['ca-nt', [0,0,0,0,0,0,0]],['ca-ab', [0,0,0,0,0,0,0]],['ca-nl', [0,0,0,0,0,0,0]],['ca-sk', [0,0,0,0,0,0,0]],['ca-mb', [0,0,0,0,0,0,0]],['ca-qc', [0,0,0,0,0,0,0]],['ca-on', [0,0,0,0,0,0,0]],['ca-nb', [0,0,0,0,0,0,0]],['ca-ns', [0,0,0,0,0,0,0]],['ca-pe', [0,0,0,0,0,0,0]],['ca-bc', [0,0,0,0,0,0,0]]]
+        for val in values :
+            for entry in default :
+                if (entry[0]==val['Region']):
+                    entry[1][val[1]-1]=val[2]
+        return default

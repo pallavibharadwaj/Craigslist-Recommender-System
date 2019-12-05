@@ -278,6 +278,93 @@ function loadBoxplot(resp) {
   });
 }
 
+function loadSpline(resp) {
+    Highcharts.chart('spline', {
+    chart: {
+        type: 'areaspline'
+    },
+    title: {
+        text: 'Posts per day of the week'
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'left',
+        verticalAlign: 'top',
+        x: 150,
+        y: 100,
+        floating: true,
+        borderWidth: 1,
+        backgroundColor:
+            Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF'
+    },
+    xAxis: {
+        categories: [
+            'Sunday',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday'
+        ]
+    },
+    yAxis: {
+        title: {
+            text: 'Number of posts'
+        }
+    },
+    tooltip: {
+        shared: true,
+        valueSuffix: ' posts'
+    },
+    credits: {
+        enabled: false
+    },
+    plotOptions: {
+        areaspline: {
+            fillOpacity: 0.5
+        }
+    },
+    series: [{
+        name: resp[0][0],
+        data: resp[0][1]
+    }, {
+        name: resp[1][0],
+        data: resp[1][1]
+    }, {
+        name: resp[2][0],
+        data: resp[2][1]
+    }, {
+        name: resp[3][0],
+        data: resp[3][1]
+    }, {
+        name: resp[4][0],
+        data: resp[4][1]
+    }, {
+        name: resp[5][0],
+        data: resp[5][1]
+    }, {
+        name: resp[6][0],
+        data: resp[6][1]
+    }, {
+        name: resp[7][0],
+        data: resp[7][1]
+    }, {
+        name: resp[8][0],
+        data: resp[8][1]
+    }, {
+        name: resp[9][0],
+        data: resp[9][1]
+    }, {
+        name: resp[10][0],
+        data: resp[10][1]
+    }, {
+        name: resp[11][0],
+        data: resp[11][1]
+    }]
+  });
+}
+
 $(document).ready(function () 
 {
     $.ajax({
@@ -289,79 +376,15 @@ $(document).ready(function ()
         }, 
         success:function(json){
             loadHighcharts(json['heatmap_posts']);
-        },
-        error:function(request, error){
-            console.log(error); //Should be removed after dev phase
-        }
-    });
-   $.ajax({
-        url:"http://localhost:5000/chartdata",
-        dataType: 'json',
-        headers: {  
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*' 
-        }, 
-        success:function(json){
+            loadSpline(json['spline']);
+            loadBoxplot(json['boxplot']);
             loadMedianRent(json['medianrent']);
-        },
-        error:function(request, error){
-            console.log(error); //Should be removed after dev phase
-        }
-    });
-    $.ajax({
-        url:"http://localhost:5000/chartdata",
-        dataType: 'json',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        success:function(json){
             loadPetAnimals(json['petanimals']);
-        },
-        error:function(request, error){
-            console.log(error); //Should be removed after dev phase
-        }
-    });
-    $.ajax({
-        url:"http://localhost:5000/chartdata",
-        dataType: 'json',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        success:function(json){
+            loadHeatMap(json['heatmap_price']);
             loadWheelchair(json['wheelchair']);
         },
         error:function(request, error){
             console.log(error); //Should be removed after dev phase
         }
     });
-    $.ajax({
-        url:"http://localhost:5000/chartdata",
-        dataType: 'json',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        success:function(json){
-            loadHeatMap(json['heatmap_price']);
-        },
-        error:function(request, error){
-            console.log(error); //Should be removed after dev phase
-        }
-    });
-    $.ajax({
-        url:"http://localhost:5000/chartdata",
-        dataType: 'json',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
-        success:function(json){
-            loadBoxplot(json['boxplot']);
-        },
-        error:function(request, error){
-            console.log(error); //Should be removed after dev phase
-        }
-    });
-});
+);
