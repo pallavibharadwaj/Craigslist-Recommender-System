@@ -327,40 +327,52 @@ function loadSpline(resp) {
     },
     series: [{
         name: resp[0][0],
-        data: resp[0][1]
+        data: resp[0][1],
+        visible : false
     }, {
         name: resp[1][0],
-        data: resp[1][1]
+        data: resp[1][1],
+        visible : false
     }, {
         name: resp[2][0],
-        data: resp[2][1]
+        data: resp[2][1],
+        visible : false
     }, {
         name: resp[3][0],
-        data: resp[3][1]
+        data: resp[3][1],
+        visible : false
     }, {
         name: resp[4][0],
-        data: resp[4][1]
+        data: resp[4][1],
+        visible : false
     }, {
         name: resp[5][0],
-        data: resp[5][1]
+        data: resp[5][1],
+        visible : false
     }, {
         name: resp[6][0],
-        data: resp[6][1]
+        data: resp[6][1],
+        visible : true
     }, {
         name: resp[7][0],
-        data: resp[7][1]
+        data: resp[7][1],
+        visible : true
     }, {
         name: resp[8][0],
-        data: resp[8][1]
+        data: resp[8][1],
+        visible : false
     }, {
         name: resp[9][0],
-        data: resp[9][1]
+        data: resp[9][1],
+        visible : false
     }, {
         name: resp[10][0],
-        data: resp[10][1]
+        data: resp[10][1],
+        visible : false
     }, {
         name: resp[11][0],
-        data: resp[11][1]
+        data: resp[11][1],
+        visible : true
     }]
   });
 }
@@ -387,4 +399,5 @@ $(document).ready(function ()
             console.log(error); //Should be removed after dev phase
         }
     });
-);
+});
+
