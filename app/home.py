@@ -5,7 +5,6 @@ from pyspark.sql.functions import to_json, col, struct
 from cassandra.cluster import Cluster
 
 
-#cluster_seeds = ['199.60.17.32']
 cluster_seeds = ['127.0.0.1']
 spark = SparkSession.builder.appName('Spark Cassandra example').config('spark.cassandra.connection.host', ','.join(cluster_seeds)).getOrCreate()
 assert spark.version>='2.4'
@@ -28,7 +27,7 @@ prev_postings_beds = session.prepare('SELECT * FROM %s WHERE token(postingid) < 
 insert_favorite = session.prepare('INSERT INTO %s (userid, postingid) VALUES (?,?)' % fav_table)
 delete_favorite = session.prepare('DELETE FROM %s WHERE userid=? AND postingid=? IF EXISTS' % fav_table)
 select_favorite = session.prepare('SELECT * from %s WHERE userid=? AND postingid=? ALLOW FILTERING' %fav_table)
-truncate_favorite = session.prepare('truncate potatobytes.favorites')
+truncate_favorite = session.prepare('truncate %s.%s' % (keyspace, fav_table))
 
 select_fav_city = session.prepare('SELECT city FROM %s WHERE postingid=?'%craigslist_table)
 select_postid = session.prepare('SELECT * FROM %s'%fav_table)
@@ -60,7 +59,7 @@ class ListingData:
 
         # get all favorites to show favorited items on reload
         fav = spark.read.format("org.apache.spark.sql.cassandra") \
-           .options(table='favorites', keyspace='potatobytes').load()
+           .options(table=fav_table, keyspace=keyspace).load()
         fav = fav.rdd.collect()
         
         resp = {

@@ -19,7 +19,6 @@ def favorites():
 def analytics():
     return render_template("analytics.html")
 
-
 @app.route("/chartdata", methods=['GET'])
 def chartdata():
     obj = charts.ChartData()
