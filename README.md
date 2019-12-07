@@ -22,6 +22,7 @@ After favoriting some listings, the user can move to the Favorites Tab at the to
 The analytics tab displays some insights about the overall Rental scene in Canada.
 
 ![alt text](Images/BoxPlot.png)
+![alt text](https://csil-git1.cs.surrey.sfu.ca/potato-bytes/craigslist-recommendation-system/blob/master/Images/BoxPlot.PNG)
 
 ![alt text](Images/Spline.png)
 
