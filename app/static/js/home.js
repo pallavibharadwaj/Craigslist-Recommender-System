@@ -9,8 +9,8 @@ function loadPost(data) {
     listings = data['listings']
     fav = data['favorites']
     
-    document.getElementById('prev').setAttribute('onclick', 'load_home(\'prev_' + listings[listings.length-1][0] + '\')')
-    document.getElementById('next').setAttribute('onclick', 'load_home(\'next_' + listings[listings.length-1][0] + '\')')
+    document.getElementById('prev').setAttribute('onclick', 'load_home(\'prev_' + listings[listings.length-1]['postingid'] + '\')')
+    document.getElementById('next').setAttribute('onclick', 'load_home(\'next_' + listings[listings.length-1]['postingid'] + '\')')
 
     document.getElementById("gobutton").setAttribute('onclick', 'load_home(\'first\')')
 
@@ -67,11 +67,11 @@ function loadPost(data) {
 
         link.setAttribute('class', 'card-body')
         link.setAttribute('id', 'craig-link')
-        a.setAttribute('href', listing[12])
+        a.setAttribute('href', listing['url'])
         a.setAttribute('class', 'btn btn-primary')
 
         icon.setAttribute('id', 'heart'+num)
-        if (exists(fav, ("potato", listing[0]))) {
+        if (exists(fav, ("potato", listing['postingid']))) {
             favorite = 1
             icon.setAttribute('class', 'icon-input-btn glyphicon glyphicon-heart heart-selected')
         }
@@ -79,13 +79,13 @@ function loadPost(data) {
             icon.setAttribute('class', 'icon-input-btn glyphicon glyphicon-heart-empty')
         }
         
-        h3.innerHTML = listing[11]
-        price.innerHTML = listing[9]
-        if (listing[2]) beds.innerHTML = listing[2] + " Beds"
-        if (listing[1]) baths.innerHTML = listing[1] + " Baths"
+        h3.innerHTML = listing['title']
+        price.innerHTML = listing['price']
+        if (listing['beds']) beds.innerHTML = listing['beds'] + " Beds"
+        if (listing['baths']) baths.innerHTML = listing['baths'] + " Baths"
 
         a.innerHTML = "View on Craigslist"
-        document.getElementById('heart'+num).setAttribute('onclick', 'add_to_favorites(\'' + listing[0] + '\', \'' + num +'\')')
+        document.getElementById('heart'+num).setAttribute('onclick', 'add_to_favorites(\'' + listing['postingid'] + '\', \'' + num +'\')')
     }
     listings.forEach(listing => buildList(listing))
 }
