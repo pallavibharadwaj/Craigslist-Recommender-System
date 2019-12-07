@@ -2,6 +2,8 @@
 
 ## Getting started ##
 
+![alt text](https://csil-git1.cs.surrey.sfu.ca/potato-bytes/craigslist-recommendation-system/blob/3b56a081829f797a7bfea8628e54bce753d420f5/DFDBD.png)
+
 Prerequsites to run the script:
 ```
 1. Root user privilege
