@@ -7,7 +7,7 @@ Prerequsites to run the script:
 1. Root user privilege
 2. git
 3. pip3
-``
+```
 
 Installation:
 ```
