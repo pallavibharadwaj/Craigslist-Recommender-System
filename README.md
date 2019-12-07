@@ -1,60 +1,48 @@
-# craigslist-recommendation-system
+# craigslist-recommendation-system #
 
-## Getting started
+## Getting started ##
 
-### Crawler ###
-
-Required dependencies and packages:
-
+Prerequsites to run the script:
 ```
-sudo apt-get install python3-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev libxslt-dev libxml2-dev1
-pip3 install scrapy
-pip3 install scrapy_useragents
-pip3 install scrapy-rotating-proxies
-```
-How to Run:
-
-```
-cd ~/craigslist-recommendation-system/crawler/crawler/spiders/
-python3 craigslist_spider.py
+1. Root user privilege
+2. git
+3. pip3
 ```
 
-### Cassandra ###
-
-Required dependencies and packages:
-* spark-cassandra-connector:
+Installation:
 ```
-git clone https://github.com/datastax/spark-cassandra-connector.git
-cd spark-cassandra-connector
-./sbt/sbt assembly -Dscala-2.11=true
-cp ~/spark-cassandra-connector/spark-cassandra-connector/target/full/scala-2.11/spark-cassandra-connector-assembly-2.4.1-28-g29e31d3.jar $SPARK_HOME/jars/
+source ./INSTALL.sh
+```
+
+### Crawler (SKIP if using the available crawled data) ###
+
+How to Run (generates data/canada.json):
+
+```
+python3 crawler/crawler/spiders/craigslist_spider.py
+```
+
+### Dumping scraped data to Cassandra ###
+
+Create the required keyspace ("potatobytes"):
+```
+CREATE KEYSPACE potatobytes WITH REPLICATION = {
+'class': 'SimpleStrategy', 'replication_factor': 1 };
 ```
 
 To populate the scraped listings from the JSON file into the Cassandra database:
-
 ```
-pip3 install cassandra-driver
-cd ~/craigslist-recommendation-system/data
-spark-submit load_cassandra.py canada.json 
+spark-submit data/load_cassandra.py data/canada.json
 ```
 
 ### Web Application ###
 
-Required dependencies and packages:
-
-```
-pip3 install flask
-pip3 install flask-cors
-```
-
 How to Run:
-
 ```
-cd ~/craigslist-recommendation-system/app
-python3 app.py
+python3 app/app.py
 ```
-In Browser:
 
+In Browser (Tested on Firefox):
 ```
 http://localhost:5000/
 ```
