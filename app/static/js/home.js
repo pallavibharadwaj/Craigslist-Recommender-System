@@ -8,15 +8,24 @@ function loadPost(data) {
     var favorite = 0
     listings = data['listings']
     fav = data['favorites']
-    
-    document.getElementById('prev').setAttribute('onclick', 'load_home(\'prev_' + listings[listings.length-1]['postingid'] + '\')')
-    document.getElementById('next').setAttribute('onclick', 'load_home(\'next_' + listings[listings.length-1]['postingid'] + '\')')
+
+   
+    var listings_postingid = (Array.isArray(listings[listings.length-1])) ? listings[listings.length-1][0] : listings[listings.length-1]['postingid']
+    document.getElementById('prev').setAttribute('onclick', 'load_home(\'prev_' + listings_postingid + '\')')
+    document.getElementById('next').setAttribute('onclick', 'load_home(\'next_' + listings_postingid + '\')')
 
     document.getElementById("gobutton").setAttribute('onclick', 'load_home(\'first\')')
 
     var num = 0
     const div = document.getElementById('listings')
     const buildList = (listing) => {
+        var data_postingid = (Array.isArray(listing)) ? listing[0] : listing['postingid'] 
+        var data_beds = (Array.isArray(listing)) ? listing[2] : listing['beds']
+        var data_baths = (Array.isArray(listing)) ? listing[1] : listing['baths']
+        var data_price = (Array.isArray(listing)) ? listing[9] : listing['price']
+        var data_title = (Array.isArray(listing)) ? listing[11] : listing['title']
+        var data_url = (Array.isArray(listing)) ? listing[12] : listing['url']
+
         const newrow = document.createElement('div')
         oldrow = $('.row')
         const col = document.createElement('div')
@@ -67,11 +76,11 @@ function loadPost(data) {
 
         link.setAttribute('class', 'card-body')
         link.setAttribute('id', 'craig-link')
-        a.setAttribute('href', listing['url'])
+        a.setAttribute('href', data_url)
         a.setAttribute('class', 'btn btn-primary')
 
         icon.setAttribute('id', 'heart'+num)
-        if (exists(fav, ("potato", listing['postingid']))) {
+        if (exists(fav, ("potato", data_postingid))) {
             favorite = 1
             icon.setAttribute('class', 'icon-input-btn glyphicon glyphicon-heart heart-selected')
         }
@@ -79,13 +88,13 @@ function loadPost(data) {
             icon.setAttribute('class', 'icon-input-btn glyphicon glyphicon-heart-empty')
         }
         
-        h3.innerHTML = listing['title']
-        price.innerHTML = listing['price']
-        if (listing['beds']) beds.innerHTML = listing['beds'] + " Beds"
-        if (listing['baths']) baths.innerHTML = listing['baths'] + " Baths"
+        h3.innerHTML = data_title
+        price.innerHTML = data_price
+        if (data_beds) beds.innerHTML = data_beds + " Beds"
+        if (data_baths) baths.innerHTML = data_baths + " Baths"
 
         a.innerHTML = "View on Craigslist"
-        document.getElementById('heart'+num).setAttribute('onclick', 'add_to_favorites(\'' + listing['postingid'] + '\', \'' + num +'\')')
+        document.getElementById('heart'+num).setAttribute('onclick', 'add_to_favorites(\'' + data_postingid + '\', \'' + num +'\')')
     }
     listings.forEach(listing => buildList(listing))
 }
