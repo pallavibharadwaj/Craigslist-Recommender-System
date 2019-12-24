@@ -1,9 +1,9 @@
-# craigslist-recommendation-system #
+# craigslist-recommender-system #
 
 Craigslist is a popular website that provides local classified advertisements for housing, community services, jobs, etc. The site serves more than 20 billion page views per month, putting it in 72nd place overall among websites worldwide. However, especially for housing, the huge volume of options to choose from, with a not so intuitive website like Craigslist, can be overwhelming for a user who wants to quickly arrive at a decision. We decided to fix this problem, by designing a recommender system, that gives recommendations to the user, based on the user's requirements.
 
 
-Follow instructions from Running.txt
+Follow installations and running instructions from Running.md
 
 
 The work flow can be represented in the below Data Flow Diagram:
