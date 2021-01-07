@@ -13,7 +13,7 @@ idna==2.8
 incremental==17.5.0
 itsdangerous==1.1.0
 Jinja2==2.10.3
-lxml==4.4.2
+lxml==4.6.2
 MarkupSafe==1.1.1
 numpy==1.17.4
 parsel==1.5.2
